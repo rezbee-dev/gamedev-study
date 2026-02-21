@@ -134,13 +134,15 @@
 ### 8. Input Map
 - Set up "actions" game listens for (that corresponds to number of keys) to know when and how to move the character
   - Instead of listening for specific keys directly, you listen for the "action" and assign keys to the action to trigger it
- 
-- 8A. Set InputMap
+
+<details><summary>Set actions for left, right, and jump </summary>
+
   - Project > Project Settings > Input Map
   - In "Add new Action", type and enter "move_left"
   - Click on "+" icon and click on the corresponding key for the action (example, "A" and "Left arrow" keys)
   - Do the same for "move_right" and "jump" actions
-
+</details>
+ 
 ### 10. Player Movement 1
 
 - Create script for player movement and jumping (simple)
@@ -210,7 +212,7 @@
       velocity.x = move_input * move_speed
 
       # takes the velocity, determines whether any collisions, and moves character
-      # moves based on velocity
+      # moves based on velocity; so should be placed after velocity is modified
       # returns true if collision or false if otherwise
       move_and_slide()
   ```
@@ -220,6 +222,87 @@
 ### 11. Player Movement 2
 
 - Adds acceleration and jumping to Player script
+
+- Misc
+  - `lerp(from, to, weight)`
+    - Linear Interpolation
+    - Finds a value that is some percentage between two other values
+    - "Smoothing" function that allows for value to slide gracefully from one to the other, without snapping instantly from 0 to 100
+
+<details><summary>11A. Implement Jumping</summary>
+
+  - Player should only be able to jump if jump action is triggered and player is on the ground
+
+  ```gd
+  # player.gd, inside _physics_process(delta) function,
+  #
+  # Jumping
+  if Input.is_action_pressed("jump") and is_on_floor():
+    # negative because positive y-values mean down and negative y-values means up
+    velocity.y = -jump_force 
+  ```
+</details>
+
+<details><summary>11B. Implement Movement smoothing</summary>
+
+  - Currently, player movement is rigid and snappy. There is no accelerating to speed or braking down to stopping, making movement feel too rigid
+
+  ```gd
+  # player.gd, inside _physics_process(delta) function,
+
+  # movement
+  if move_input != 0:
+        # multiply by delta to make smoothing frame-independent
+        velocity.x = lerp(velocity.x, move_input * move_speed, acceleration * delta)
+    else:
+        velocity.x = lerp(velocity.x, 0.0, braking * delta)
+  ```
+</details>
+
+### 12. Facing Movement Direction
+- Flip sprite so it faces the direction its moving
+
+<details><summary>12A. Ensure player sprite faces the direction of movement</summary>
+
+  - In `player.gd` script, need to create reference to `Sprite2D` node, then use it to invoke `.flip_h` (found in sidebar menu Sprite2D > Offset > Flip H)
+
+  ```gd
+  extends CharacterBody2D
+
+  # Variables...
+
+  @onready var sprite : Sprite2D = $Sprite
+
+  # def _physics_process(delta)....
+
+  func _process(delta):
+    # if statement ensures sprite is flipped only when player is moving
+    if velocity.x != 0:
+      # velocity.x > 0 means moving to right, otherwise means moving to left
+      # depending on default sprite face direction, set flip_h to velocity.x > 0 or velocity.x < 0
+      sprite.flip_h = velocity.x > 0
+  ```
+</details>
+
+### 13. Player Animation 1
+
+- Setup animations for idle, moving, and jumping
+
+- Misc
+  - While this tutorial uses "AnimationPlayer", a more simple one would be "AnimatedSprite2D" which allows you to flip through Sprite Frames for animation
+
+<details><summary>13. Setup Player Animation</summary>
+
+  - Add "AnimationPlayer" node to root player node
+  - Select and then press on "Animation" in bottom bar "animation" window
+  - Create Animation labelled "Idle"
+  - Change animation duration to 0.5 (edit duration field near top right, next to timeline)
+  - Set animation for "texture" property: Select "Sprite" from scene hiearchy and then click on the white "key" icon next to "Texture" in right sidebar menu
+    - This should add a "texture" track to the Animation window in the bottom
+</details>
+
+
+
 
 <details><summary></summary>
 
