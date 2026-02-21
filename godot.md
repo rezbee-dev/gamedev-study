@@ -141,6 +141,86 @@
   - Click on "+" icon and click on the corresponding key for the action (example, "A" and "Left arrow" keys)
   - Do the same for "move_right" and "jump" actions
 
+### 10. Player Movement 1
+
+- Create script for player movement and jumping (simple)
+- Misc
+  - Exporting variables
+    - Allows variables to be modified outside of code, in editor
+   
+<details><summary>10A. Create Player Script</summary>
+
+  - Select "Player" scene
+  - In sidebar menu, add script, and save as "player.gd"
+</details>
+
+<details><summary>10B. Export variables for move_speed, acceleration, braking, gravity, and jump_force</summary>
+
+  ```gd
+  # Maximum movement speed
+  @export var move_speed : float = 100
+
+  # Rate at which player movement speed increases until reaching move_speed
+  # Allows for smooth movement
+  @export var acceleration : float = 50
+
+  # Rate at which player slows down when movement keys no longer pressed
+  @export var braking : float = 20
+
+  # How much downward force to apply to player
+  @export var gravity : float = 500
+
+  # How much upward force to apply when player jumps
+  @export var jump_force : float = 200
+  ```
+</details>
+
+
+<details><summary>10C. Add functionality for moving left and right and falling</summary>
+
+  ```gd
+  extends CharacterBody2D
+
+  ##############################################
+  # Export variables from 10B
+  # .....
+  # .....
+  # .....
+  ##############################################
+
+  # represents whether player is moving left (-1), right (1), or stopped (0)
+  var move_input : float
+
+  # function that runs at a fixed, consistent rate, allowing for frame-rate independent movement
+  # Allows for logic to sync with Godot's physics engine (which calculates collisions and gravity)
+  #   otherwise, doing physics stuff in _process() can cause jitter
+  func _physics_process(delta):
+      # Determine whether player is falling or not, depending on whether character is on floor or not
+      # "is_on_floor()" is provided by CharacterBody2D
+      if not is_on_floor():
+          # move player down by gravity per delta 
+          velocity.y += gravity * delta
+
+      # Input.get_axis() returns -1.0 for left movement, +1.0 for right movement, and 0.0 for no movement
+      move_input = Input.get_axis("move_left", "move_right")
+
+      # Variable from `CharacterBody2D` (inherited)
+      # Sets left and right direction and movement
+      # move_speed allows for movement to be 100 pixels for second rather than 1 (which is sloooow)
+      velocity.x = move_input * move_speed
+
+      # takes the velocity, determines whether any collisions, and moves character
+      # moves based on velocity
+      # returns true if collision or false if otherwise
+      move_and_slide()
+  ```
+</details>
+
+
+### 11. Player Movement 2
+
+- Adds acceleration and jumping to Player script
+
 <details><summary></summary>
 
   - 
