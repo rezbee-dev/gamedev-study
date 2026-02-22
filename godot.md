@@ -355,20 +355,116 @@
   ```
 </details>
 
-### 16. Enemy 1
+### 16. Enemy 1 & 2
 
 - Setup Enemy scene that moves from one point to another, back and forth
+  - Player can go through it, but when touched, it triggers "damage"
+- Misc
+  - Area2D
+    - Can detect collisions, but does not physically collide with other objects
+      - "Ghostly"
+    - Ex: Coins, health packs, detect when player enters room, etc. 
 
 
+<details><summary>16A. Setup Enemy Scene (sprite, collision, animation, etc nodes)</summary>
+
+  - Add Area2D node to level scene, rename to "Enemy" and save as scene
+  - Add "character_0024.png" to it and rename to "Sprite"
+  - Add "CollisionShape2D" and set to circle shape over sprite
+  - Add "AnimationPlayer" 
+</details
 
 
+<details><summary>16B. Setup Enemy Script so enemy moves between two points</summary>
+
+  - Need to set variables for move direction (up, down, left, right) and move speed
+  - Need to set start and target positions (so enemy can move back and forth on set path)
+
+  ```gd
+  extends Area2D
+
+  @export var move_direction : Vector2
+  @export var move_speed : float = 20
+
+  @onready var start_pos : Vector2 = global_position
+  @onready var target_pos : Vector2 = global_position + move_direction
+
+  func _physics_process(delta):
+    # move_toward(to, delta) will return vector moved towards "to" by fixed delta amount (doesn't go past "to")
+    # so every physics frame, global position of Enemy is updated to be closer to "target_pos"
+    global_position = global_position.move_toward(target_pos, move_speed * delta)
+
+    # once enemy reaches target_pos, reset target_pos to be start_pos
+    if global_position == target_pos:
+      if target_pos == start_pos:
+        target_pos = start_pos + move_direction
+      else:
+        target_pos = start_pos
+  ```
+</details>
 
 
+<details><summary>16C. Setup signal for when player enters enemy collider (touches enemy)</summary>
+
+  - Specifically, enemy will detect when player's collider overlaps or enters the enemy's collider
+  - Click on Enemy node
+  - Go to Node panel on right sidebar menu (top tab)
+  - Select Signals > body_entered(body: Node2D), and double click and connect to enemy node
+    - this should add new method to enemy script
+</details>
 
 
+<details><summary>16D. Assign player to Group so enemy can identify Player</summary>
+
+  - Click on Player Scene
+  - Go to Node panel (right hand side side bar menu, top tab)
+  - Select Groups (next to Signal tab)
+  - Click the "+" icon and add new group labelled "Player"
+  - Now that Player is tagged as being part of "Player" group, we can check for this group in enemy "body_entered" function
+</details>
 
 
+<details><summary>16D. Write collision detection script for detecting when player touches enemy</summary>
 
+  ```gd
+  # inside enemy.gd
+  ## Variables...
+  ## _physics_process(delta):...
+
+  func _on_body_entered(body):
+    # if not player, then ignore
+    if not body.is_in_group("Player"):
+        return
+
+    print("Deal damage to player")
+  ```
+</details>
+
+
+<details><summary>16E. Animate Enemy (so wings flap when moving)</summary>
+
+  - Click on AnimationPlayer, add new animation (click on Animation in animation player window), and name as "fly"
+  - Click on enemy sprite and then add texture key to animation (ensure "create RESET track(s)" is set)
+  - Change duration to 0.3
+  - Add new texture key at 0.1 seconds in timeline
+    - set to character_0025.png
+  - Add new texture at 0.2
+    - set to cahracter_0026.png
+  - Set animation to loop in animation window
+  - In script, play the "fly" animation:
+  ```gd
+  # inside enemy.gd
+  ## Variables...
+
+  func _ready():
+    # initializes animation player to play "fly" animation upon startup
+    $AnimationPlayer.play("fly")
+
+  ## _physics_process(delta):...
+
+  ## _on_body_entered(body):
+  ```
+</details>
 
 <details><summary></summary>
 
