@@ -284,22 +284,88 @@
   ```
 </details>
 
-### 13. Player Animation 1
+### 13. Player Animation 1 & 2
 
 - Setup animations for idle, moving, and jumping
 
 - Misc
   - While this tutorial uses "AnimationPlayer", a more simple one would be "AnimatedSprite2D" which allows you to flip through Sprite Frames for animation
+  - Reset Track
+    - Allows for returning animation back to default state after an animation
+    - Contains default values for all modified properties
+    - Can be found in dropdown menu next to the animation button in the animation window
 
-<details><summary>13. Setup Player Animation</summary>
+<details><summary>13A. Setup Player Animation and create IDLE and RESET animation tracks</summary>
 
   - Add "AnimationPlayer" node to root player node
   - Select and then press on "Animation" in bottom bar "animation" window
   - Create Animation labelled "Idle"
   - Change animation duration to 0.5 (edit duration field near top right, next to timeline)
   - Set animation for "texture" property: Select "Sprite" from scene hiearchy and then click on the white "key" icon next to "Texture" in right sidebar menu
+    - Ensure "Create RESET Track(s)" is selected and click create
     - This should add a "texture" track to the Animation window in the bottom
 </details>
+
+<details><summary>13B. Add "Move" animation track</summary>
+
+  - In animationplayer window, click "Animation" and create new animation labelled "move"
+  - Add texture property key frame to animation (ensure RESET is selected)
+  - Replace texture value (in sidebar window) for initial key with "character_0001.png" (legs are spread apart more)
+  - Add new key halfway through the duration, and set texture value back to "character_0000.png"
+  - Enable "animation looping" by clicking on double arrow circle bottom in top right side in animation window, above timeline
+  - Change animation duration to 0.25 - 0.50 (make movement animate faster)
+</details>
+
+
+<details><summary>13C. Add "Jump" animation track</summary>
+
+  - In animationplayer window, click "Animation" and create new animation labelled "jump"
+  - Add texture property key frame to animation (ensure RESET is selected)
+  - Replace texture value (in sidebar window) for initial key with "character_0001.png" (legs are spread apart more)
+  - Note: duration not needed since jump is simply a single frame that is held while in the air
+</details>
+
+
+<details><summary>13D. Implement scripting for the animation</summary>
+
+  ```gd
+  extends CharacterBody2D
+
+  # Variables...
+
+  @onready var anim : AnimationPlayer = $AnimationPlayer
+  
+  # def _physics_process(delta)....
+
+  func _process(delta):
+    # prev. code...
+
+    _manage_animation()
+
+  # plays jump animation if not on floor
+  # plays move animation if velocity not 0
+  # plays idle animation if not moving
+  func _manage_animation():
+    if not is_on_floor():
+        anim.play("jump")
+    elif move_input != 0:
+        anim.play("move")
+    else:
+        anim.play("idle")
+  ```
+</details>
+
+### 16. Enemy 1
+
+- Setup Enemy scene that moves from one point to another, back and forth
+
+
+
+
+
+
+
+
 
 
 
