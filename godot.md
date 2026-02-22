@@ -372,7 +372,7 @@
   - Add "character_0024.png" to it and rename to "Sprite"
   - Add "CollisionShape2D" and set to circle shape over sprite
   - Add "AnimationPlayer" 
-</details
+</details>
 
 
 <details><summary>16B. Setup Enemy Script so enemy moves between two points</summary>
@@ -465,6 +465,126 @@
   ## _on_body_entered(body):
   ```
 </details>
+
+### 18. Damage
+- Add feature where player takes damage and damage reduces health and causes game over
+
+<details><summary>18A. Implement player health & game over if health is <= 0</summary>
+
+  ```gd
+  # inside player.gd
+
+  ## Variables...
+  @export var health : int = 3
+
+  ## _physics_process(delta)....
+  ## _process()...
+
+  func take_damage(amount: int):
+    health -= amount
+    if health <= 0:
+        # call_deferred needed, otherwise you get an error "removing collision node during physics call back not allowed"
+        # call_deferred delays call to game_over until end of physics frame, avoiding physics callback error
+        # the reason this happens, is because in enemy.gd, we call this method inside of _on_body_entered() which runs during physics process
+        call_deferred("game_over")
+
+  func game_over():
+    get_tree().change_scene_to_file("res://Scenes/level_1.tscm")
+  ```
+</details
+
+
+<details><summary>18B. Implement enemy damage player</summary>
+
+  ```gd
+  # inside enemy.gd
+
+  ## previous code...
+
+  func _on_body_entered(body):
+    if not body.is_in_group("Player"):
+      return
+    body.take_damage(1)
+  ```
+</details>
+
+
+### 19. Coin 1 & 2 
+- Implement coin where when player collect it, it increases player score
+- Coin should have animation (bobbing up/down and rotation)
+
+<details><summary>19A. Create coin scene</summary>
+
+  - Create Area2D node and rename it "Coin" and save
+  - Add as child, Sprite2D node renamed as Sprite with "tile_0151.png"
+  - If necessary, set to (0,0) in Node2D (sidebar) > Transform > Position
+  - Add CollisionShape2D with CircleShape2D
+  - Add "coin.gd" script
+</details>
+
+
+<details><summary>19B. Create coin animation (bobbing up/down and rotation)</summary>
+
+  ```gd
+  extends Area2D
+
+  var rotate_speed : float = 3.0
+  var bob_height : float = 5.0
+  var bob_speed : float = 5.0
+
+  @onready var start_pos : Vector2 = global_position
+
+  @onready var sprite : Sprite2D = $Sprite
+
+  # using physics since Area2D has collision detection stuff 
+  func _physics_process(delta):
+    # gets current time in seconds
+    var time = Time.get_unix_time_from_system()
+
+    # rotate
+    # modifying scale.x mimics rotation appearance
+    # sin() allows us to keep values between two values
+    # time allows for value to change 
+    sprite.scale.x = sin(time * rotate_speed)
+
+    # bob up and down
+    # the 1+ and /2 is to keep range of sin() between start y and 1, so coin does not go below starting y position (ex: 0 and 1 instead of -1 and 1)
+    var y_pos = ((1 + sin(time * bob_speed)) / 2) * bob_height
+    global_position.y = start_pos.y - y_pos
+  ```
+</details>
+
+
+<details><summary>19C. Implement coin collect functionality (when player touches coin, increase score and despawn coin)</summary>
+
+  - Add placeholder function, "increase_score()" to player.gd script
+
+  ```gd
+  # inside player.gd
+
+  func increase_score(amount: int):
+    # will implement scorring system later
+    print("increase score")
+  ```
+
+  - Add `body_entered` signal into `coin.gd` (click on coin scene, then select signals over in sidebar menu right, and select "body_entered" then connect)
+  - in coin.gd script, add the following code
+
+  ```gd
+  # checks if player touched coin
+  func _on_body_entered(body):
+    if not body.is_in_group("Player"):
+        return
+    body.increase_score(1)
+    # causes coin to disappear; queues the coin node for deletion at the end of current frame after it has finished processing
+    queue_free()
+  ```
+</details>
+
+
+### 21. Scoring
+- Setup scoring system
+- 
 
 <details><summary></summary>
 
