@@ -359,6 +359,8 @@
 
 - Setup Enemy scene that moves from one point to another, back and forth
   - Player can go through it, but when touched, it triggers "damage"
+  - Add enemy to level whereever it makes sense
+    - Organize under "empty node"
 - Misc
   - Area2D
     - Can detect collisions, but does not physically collide with other objects
@@ -449,7 +451,7 @@
   - Add new texture key at 0.1 seconds in timeline
     - set to character_0025.png
   - Add new texture at 0.2
-    - set to cahracter_0026.png
+    - set to character_0026.png
   - Set animation to loop in animation window
   - In script, play the "fly" animation:
   ```gd
@@ -491,7 +493,7 @@
   func game_over():
     get_tree().change_scene_to_file("res://Scenes/level_1.tscm")
   ```
-</details
+</details>
 
 
 <details><summary>18B. Implement enemy damage player</summary>
@@ -520,6 +522,8 @@
   - If necessary, set to (0,0) in Node2D (sidebar) > Transform > Position
   - Add CollisionShape2D with CircleShape2D
   - Add "coin.gd" script
+  - Add coins to level wherever it makes sense
+    - Organize under "empty node"
 </details>
 
 
@@ -584,9 +588,171 @@
 
 ### 21. Scoring
 - Setup scoring system
-- 
+- Misc
+  - [Autoload](https://docs.godotengine.org/en/stable/tutorials/scripting/singletons_autoload.html)
+    - aka Singleton
+    - Used to load a scene or script that will be attached to a node and will be added to the root node before any other scenes are loaded
+    - Allows for it to be always loaded, no matter the current running scene
+    - Can store global variables/state
+    - Must be added to "Globals" in: Project > Project SEttings > Globals > Autoload
+      - if "Global Variable" is checked in the "Autoload" window, then it will be able to be accessed directly in GDScript
+
+<details><summary>21A. Define global variable "score"</summary>
+
+  - Cannot just be added to "Player" or "Level" scene since we want score to persist across levels, and if attached to "Player", it would just get reset when switching levels (or scenes)
+  - Go to Project > Project Settings > Global, then enter "PlayerStats" in Node name field and click add
+    - save to scripts folder when prompted
+  - Inside "playerstats.gd":
+
+  ```gd
+  extends Node
+
+  var score : int = 0
+  ```
+</details>
+
+
+<details><summary>21B. Modify "increase_score()" to update the global score variable</summary>
+
+  ```gd
+  # inside player.gd
+
+  func increase_score(amount : int):
+    PlayerStats.score += amount
+    print(PlayerStats.score)
+  ```
+</details>
+
+
+### 22. End Flag
+- Add "end flag" to level so that touching it will end the level (switch scene)
+
+<details><summary>22A. Create End Flag Scene</summary>
+
+  - Create Area2D node, rename to EndFlag, add "tile_0112.jpg" as Sprite, and set position to 0,0
+  - Add collisionshape2d node with circle shape
+  - Add script "endflag.gd"
+  - Include "body_entered" signal from right sidebar menu (Node > Signals > body_entered(...)" to "endflag.gd" script
+  - Code:
+
+  ```gd
+  extends Area2D
+
+  @export var scene_to_load : PackedScene
+
+  func _on_body_entered(body):
+    if not body.is_in_group("Player"):
+      return
+
+    get_tree().change_scene_to_packed(scene_to_load)
+  ```
+</details>
+
+
+### 24. UI 1 & 2
+
+- Add hearts for HP and text for score
+- Misc
+  - CanvasLayer
+    - Node that adds a separate 2D rendering layer for all its children
+    - While "Viewport" children draws by default at layer "0", CanvasLayer will draw at any other numeric layer
+    - Layers with a greater number will be drawn above those with a smaller number
+
+<details><summary>24A. Setup UI and create Heart display (health)</summary>
+
+  - Open Player scene and add "CanvasLayer" node to it
+    - Add script "player_ui.gd" to it
+  - Add "TextureRect" node to the "CanvasLayer" node as child
+  - Rename it to "Heart"
+  - Assign "tile_0044.png" texture to the "Heart" texturerect node in the sidebar "texture" field
+  - In sidebar, go to "Layout" > "Transform" then set size to 80px by 80px
+  - Add "HBoxContainer" to CanvasLayer as child
+    - Rename to "HealthContainer"
+    - In sidebar menu, go to Layouts > Transform > Size, and set y to 80px
+    - Drag Heart texturerect node to be child of healthcontainer node
+    - In Heart node, in sidebar menu, set "expand mode" from "keep size" to "fit width"
+    - Duplicate the hearts so there are three, arranged horizontally
+    - Place heartcontainer where it makes sense on the UI
+</details>
+
+
+<details><summary>24B. Create Score Display</summary>
+
+  - Add node "Label" as child of "CanvasLayer" node
+  - Rename to "ScoreText"
+  - In sidebar menu, set "Text" to "Score: 500"
+  - In sidebar menu, set font to 38px and shadow to 6px
+    - Shadow is to make score easier to read against light backgrounds
+</details>
+
+
+<details><summary>24C. Setup UI update via scripting and signals</summary>
+
+  ```gd
+  # inside player.gd
+
+  # define two signals at top of script
+  signal OnUpdateHealth (health : int)
+  signal OnUpdateScore (score : int)
+
+  # modify take_damage()
+  func take_damage (amount : int):
+    health -= amount
+    OnUpdateHealth.emit(health)
+
+    if health <= 0:
+        call_deferred("game_over")
+
+  # modify increase_Score()
+  func increase_score (amount : int):
+    PlayerStats.score += amount
+    OnUpdateScore.emit(PlayerStats.score)
+  ```
+</details>
+
+
+<details><summary>24D. Update UI elements</summary>
+
+  ```gd
+  # inside player_ui.gd script,
+
+  extends CanvasLayer
+
+  @onready var health_container = $HealthContainer
+  # stores values of the hearts in an array
+  var hearts : Array = []
+
+  @onready var score_text : Label = $ScoreText
+
+  # references the player itself
+  @onready var player = get_parent()
+
+  # inits variables and sets up the necesary connections to update UI via signals
+  func _ready():
+    hearts = health_container.get_children()
+
+    # connect the custom signals defined in player.gd to the callback functions _update_hearts and _Update_score
+    # the values "emitted" by the signals are passed into the callback functions when invoked
+    player.OnUpdateHealth.connect(_update_hearts)
+    player.OnUpdateScore.connect(_update_score)
+
+    _update_hearts(player.health)
+    _update_score(PlayerStats.score)
+
+  # only updating visibility; not deleting the hearts
+  # hearts updated based on current health
+  func _update_hearts(health : int):
+    for i in range(len(hearts)):
+        # hearts are visible if index is less than player's health, otherwise false
+        hearts[i].visible = i < health
+
+  # Update's score text label with player's current score
+  func _update_score(score : int):
+    score_text.text = "Score: " + str(score)
+  ```
+</details
+
 
 <details><summary></summary>
 
-  - 
 </details>
