@@ -752,6 +752,78 @@
   ```
 </details
 
+### 26. Damage Visuals
+
+- Implement damage flashing and effects when player takes damage (when touching enemy)
+  
+<details><summary>26A. Implement Damage Flashing</summary>
+
+  - Player color should change to reddish hue when damaged for a few seconds before returning to normal color
+    - the color setting to be changed would be found under Sprite2D Side bar menu > CanvasItem > Modulate 
+  - In player.gd, add "damage_flash" function
+
+  ```gd
+  func _damage_flash():
+    sprite.modulate = Color.RED
+    # wait
+    await get_tree().create_timer(0.05).timeout
+    sprite.modulate = Color.WHITE
+  ```
+</details>
+
+<details><summary>26B. Implement camera shake</summary>
+
+  - Screen will shake when player takes damage
+  - Add script to camera node in Player scene
+  - Require's modifying the offset property in Camera node
+
+  ```gd
+  # player camera
+
+  extends Camera2D
+
+  var intensity : float = 0
+
+  func _ready():
+    # get_parent() = player node
+    # whenever player's health is changed, _damage_shake is invoked
+    get_parent().OnUpdateHealth.connect(_damage_shake)
+
+  func _damage_shake (health: int):
+    intensity = 3
+
+  func _process(delta):
+    if intensity > 0:
+      # decrease intensity over time
+      intensity = lerpf(intensity, 0, delta *10)
+      offset = _get_random_offset()
+
+  # returns random offset based on intensity
+  func _get_random_offset() -> Vector2:
+    var x = randf_range(-intensity, intensity)
+    var y = randf_range(-intensity, intensity)
+
+    return Vector2(x, y)
+  ```
+</details>
+
+<details><summary>26C. Implement game over upon leaving screen bounds</summary>
+
+  ```gd
+  # player.gd
+
+  func _process(delta):
+    # ...
+
+    if global_position.y > 200:
+      game_over()
+    _manage_animation()
+  ```
+</details>
+
+<details><summary></summary>
+
+</details>
 
 <details><summary></summary>
 
