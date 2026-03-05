@@ -821,9 +821,152 @@
   ```
 </details>
 
-<details><summary></summary>
+### 28. Background Parallax
 
+- Setup background parallax effect where background moves at a different rate than foreground to simulate depth
+
+
+<details><summary>28A. Setup background for parallax effect</summary>
+
+  - Inside "main" scene (level 1)
+  - Resize background, Transform > Scale > 0.5
+  - Reposition background to center, Transform > Position > (0, 0)
+  - Create tiling background
+    - Duplicate background sprite and move to the right by holding shift and adjusting position (can use offset of 512 pixels)
+    - Repeat until entire level is covered
+  - Organize dupe backgrounds
+    - Create new Node2D node and rename to Background
+    - Set position to (0,0)
+    - Drag all background sprite nodes as children of background node
 </details>
+
+<details><summary>28B. Implement parallax effect</summary>
+
+  - Create and attach new script to Background node and name as "background_parallax.gd"
+
+  ```gd
+  extends Node2D
+
+  # determines rate at which background moves in relation to player
+  # 0.7 value means moving at 70% of player speed
+  var parallax : float = 0.7
+  @onready var player = $"../Player"
+
+  # runs every frame and updates background's position based on player position and parallax value
+  func _process (delta):
+    global_position = player.global_position * parallax
+  ```
+</details>
+
+### 29. Audio
+
+- Add sound effects to play when certain events occur (ex: collecting coin, taking damage, etc)
+  
+<details><summary>29A. Implement sound effects</summary>
+
+  - Add "AudioStreamPlayer" node to player scene
+
+  ```gd
+  # inside of player.gd
+
+  # reference AudioStreamPlayerNode
+  @onready var audio : AudioStreamPlayer = $AudioStreamPlayer
+
+  # preload sound effects
+  var take_damage_sfx : AudioStream = preload("res://Audio/take_damage.wav")
+  var coin_sfx : AudioStream = preload("res://Audio/coin.wav")
+
+  func play_sound(sound : AudioStream):
+    audio.stream = sound
+    audio.play()
+
+  # modify take_damage() function,
+  func take_damage(amount : int):
+    health -= amount
+    OnUpdateHealth.emit(health)
+    _damage_flash()
+    play_sound(take_damage_sfx)
+
+    if health <= 0:
+        call_deferred("game_over")
+
+  # modify increase_score() function,
+  func increase_score(amount : int):
+    PlayerStats.score += amount
+    OnUpdateScore.emit(PlayerStats.score)
+    play_sound(coin_sfx)
+  ```
+</details
+
+### 30. Creating New Levels
+
+<details><summary>30A. Add new levels</summary>
+
+  - Duplicate main scene and rename
+  - modify background sprite
+  - Modify tilemap
+    - Select TileMapLayer
+    - Use eraser tool to delete existing tiles in the tile editor
+    - select appropripate themed sprite tiles
+    - create new platforms/level design
+  - position end flag, coins, and enemies as needed
+  - Change background color
+    -  Select Background node
+    -  Adjust setting Visibility > Modulate
+</details>
+
+### 31. Menu
+
+<details><summary>31A. Setup Game Menu</summary>
+
+  - Create new scene
+  - Select User Interface as root node (rename to menu and save)
+  - Add TextureNode as child
+    - Add background image into Texture property
+    - Set Anchor Preset (using green circle button on top bar) and select full rect (bottom right corner)
+      - this will make texturerect be anchored to entire game window
+    - Change expand mode to fit height (allows for image resize based on height)
+    - Rename texturerect node to background
+    - Ensure texturerect node is resized in game editor to fill full screen resolution (blue box outline)
+  - Add Label node to Menu root node
+    - Rename to Title
+    - Set text property to game name
+    - Control > LAyout > Layout Mode > Anchors
+    - Control > LAyout > Anchors Preset > Center
+    - Change horizontal and vertical alignment to center
+  - Resize Label
+    - Create new label settings resource by selecting new labelsettings from label settings dropdown
+    - click on LabelSettings and set font size to 48px, font color to light yellow, outline to 5px, outline color to forest green, and shadow size to 5px
+  - Add buttons (play and quit)
+    - Rename to play and quit
+    - Control > Layout > Layout Mode > Anchors
+    - Control > Layout > Anchors Preset > Center
+</details>
+
+<details><summary>31B. Implement play and quit functionality </summary>
+
+  - Add script to menu root and rename to "menu.gd"
+  - Connect "pressed" signal of PlayButton and QuitButton to script
+
+  ```gd
+  # menu.gd
+
+  extends Control
+
+  func _on_play_button_pressed():
+    PlayerStats.score = 0
+    get_tree().change_scene_to_file("res://Scenes/level_1.tscn")
+
+  func _on_quit_button_pressed():
+    get_tree().quit()
+  ```
+</details>
+
+<details><summary>31C. Final touches</summary>
+
+  - Modify end flags to load next scene
+  - Update game over logic (player.gd) so it loads menu scene
+</details
 
 <details><summary></summary>
 
