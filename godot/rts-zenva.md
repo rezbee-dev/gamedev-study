@@ -18,6 +18,7 @@
   - Attacking
 - Unit Movement
   - Includes obstacle avoidance
+  - Includes "wobble" (moving side to side) when walking
 - Unit Targeting
   - Player Targeting
     -  Select a unit with the left mouse button.
@@ -35,6 +36,16 @@
   - The game ends when only one team remains.
   - An end screen will display the winning team.
   - Additionally, the game will launch into a menu screen where players can choose to play or quit the game.
+
+## 5. Project Setup
+- Import [assets](https://academy.zenva.com/wp-content/uploads/2025/02/Assets-Godot-RTS.zip)
+- Create folders: scripts and scenes
+- Create main scene with 2D scene as root node, and renamed to `Main`
+- Add camera2D
+  - set zoom property to 2 (sidebar)
+- Go to Project Settings and change default texture filter from Linear to Nearest (fix blurry texture problem)
+
+## 6. Tilemap
 
 <details><summary></summary>
   
