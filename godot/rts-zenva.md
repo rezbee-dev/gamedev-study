@@ -47,8 +47,16 @@
 
 ## 6. Tilemap
 
-<details><summary></summary>
-  
+<details><summary>6A. Create tile map for game environment</summary>
+
+  - Add as child TileMapLayer
+  - Create TileSet Resource
+    - Save to file system: Create New > Resource > TileSet
+    - Open it
+    - Drag over tilemap image into tile sources window (click yes on Atlas)
+    - May need to adjust margins, separations, etc. from the setup menu
+  - Add TileSet to TileMapLayer node (in the inspector)
+  - Create arena based on tileset and make it fit within camera bounds  
 </details>
 
 <details><summary></summary>
