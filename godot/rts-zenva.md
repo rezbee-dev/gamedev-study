@@ -59,6 +59,65 @@
   - Create arena based on tileset and make it fit within camera bounds  
 </details>
 
+## 7. Navigation Region
+
+- Navigation region
+  - defines areas where navigation agents can move while avoiding obstacles
+- Navigation Agents
+  - entities that need to travel from one point to another while avoiding obstacles  
+
+<details><summary>7A. Create Navigation Region</summary>
+
+  - Add NavigationRegion2D node
+  - In inspector, set NavigationPolygon proprty with reource
+</details>
+
+<details><summary>7B. Define walkable areas</summary>
+
+  - Click NavigationNode and define points on map to represent walkable area
+</details>
+
+
+<details><summary>7C. Create Obstacles</summary>
+
+  - Add NavigationObstacle2D as child of NavigationRegion2D node
+  - Select the node and define the obstacle area by clicking and dragging to create points around the obstacle
+    - be sure to include padding around obstacle to account for unit sprite size (to prevent clipping) 
+  - In the inspector, enable "Effect Navigation Mesh" and "Carve Navigation Mesh" under "Navigation Mesh" collapsible menu
+  - Click on "NavigationRegion2D" and Click "Bake Navigation Polygon" (carves out space within navigation mesh for obstacle)
+</details>
+
+## 9. Unit Scene
+
+- Why Area2D node is used here?
+  - since characters will be utiizing navmesh, setting up collisions is not needed so no need to use rigidbody based node
+  - Just need area2d to _detect_ collision rather than act upon it
+
+<details><summary>9A. Setup Base Unit scene</summary>
+
+  - Add Area2D node and rename to unit_base
+  - Add sprite to unit_base and rename to Sprite
+  - Center position of sprite to (0,0)
+  - Save scene, then open it
+  - Add ColisionShape2D and set shape to cover the sprite
+  - Add NavigationAgent2D node
+</details>
+
+<details><summary>9B. Setup Health Bar</summary>
+
+  - Add progresbar node and rename to healthbar
+  - In inspector, disable "Show Percentage"
+  - Adjust the scale and size of health bar so it appears aobve characters head
+    - Go to Layout > Transform and set scale to (0.1,0.1)
+    - Set the size to (200,40) and positiion it above unit's head
+  - Change colors and add border
+    - Go to Theme Overrides > Styles
+    - Create new "StyleBoxFlat" for background and set to dark grey (#202020)
+    - Create new "StyleBoxFlat" for the fill, and set color to red (#fa1e1e)
+    - Add border by setting width to (5,5,5,5) and match border color to background color
+    -  
+</details>
+
 <details><summary></summary>
   
 </details>
