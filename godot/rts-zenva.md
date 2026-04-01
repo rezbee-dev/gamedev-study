@@ -114,8 +114,148 @@
     - Go to Theme Overrides > Styles
     - Create new "StyleBoxFlat" for background and set to dark grey (#202020)
     - Create new "StyleBoxFlat" for the fill, and set color to red (#fa1e1e)
-    - Add border by setting width to (5,5,5,5) and match border color to background color
-    -  
+    - Add border by setting width to (5,5,5,5) and match border color to background color  
+</details>
+
+## 10. Unit Script
+- Setup unit script that will control things lilke moving to a target, attacking, managing health, etc.
+- Script features
+  - Includes `class_name Unit` so code can be used as reference for other code
+  - Signal for when unit takes damage (int value)
+  - Signal for when unit dies (Unit reference value)
+  - Unit variables that can be adjusted in inspector
+    - move_speed
+    - cur_hp
+    - max_hp
+    - attack_range (how far away unit must be away from target before it can begin attacking)
+    - attack_rate (minimum time allowed between attacks)
+    - attacke_damage (how much damage unit deals when it attacks)
+    - team (PLAYER or AI)
+    - agent (reference to navigationagent)
+  - Other variables
+    - last_attack_time (to track when unit last attacked)
+    - enum Team {PLAYER, AI} (defines which team unit belongs to)
+    - attack_target: Unit (which unit this unit is pursuing)
+  - Functions
+    - _process(delta) (gets called each frame)
+    - _target_check (called each frame, and detects how far away from target - if too far, then move towards target and if in range, then begin attacking)
+    - _try_attack_target() (try to attack target, and check if possible)
+    - set_move_to_target(target: Vector2)
+    - set_attack_target (target: Unit)
+    - take_damage (amount: int) (what happens when unit takes damage)
+    - _die() (what happens when HP reaches 0)
+
+<details><summary>10A. Setup base unit script that includes the features above.</summary>
+  - In unit base scene, create scrupt for root area2d node and name as "unit"
+
+
+  ```gd
+  extends Area2D
+  class_name Unit
+
+    signal OnTakeDamage (health : int)
+    signal OnDie (unit : Unit)
+    @export var move_speed : float = 10.0
+    @export var cur_hp : int = 20
+    @export var max_hp : int = 20
+    @export var attack_range : float = 20.0
+    @export var attack_rate : float = 0.5
+    var last_attack_time : float
+    @export var attack_damage : int = 5
+    enum Team { PLAYER, AI }
+    @export var team : Team
+    var attack_target : Unit
+
+    @onready var agent : NavigationAgent2D = $NavigationAgent2D
+    func _process (delta):
+      pass
+
+    func _target_check ():
+      pass
+
+    func _try_attack_target ():
+      pass
+
+    func set_move_to_target (target : Vector2):
+      pass
+
+    func set_attack_target (target : Unit):
+      pass
+
+    func take_damage (amount : int):
+      pass
+
+    func _die ():
+      pass
+  ```
+</details>
+
+## 11. Unit Movement
+- Implement unit movement and ensure smooth navigation around obstacles
+- Includes Move function
+  - calculates the next position along the navigation path and moves the unit towards it
+  - Uses NavigationAgent2D to get the next path position, which is the point the unit should move towards
+  - Based on the next point, calculates direction and movement vector unit should move
+  - Applies it to unit via translate
+
+<details><summary>11A. Modify unit script to include move function</summary>
+
+  - 
+  - In `unit.gd`,
+
+  ```gd
+    func _process(delta):
+      _move(delta)
+
+    func _move(delta):
+      # get_next_path_position generates path based on navigable area, accounting for obstacles, and gives next point along the path 
+      var move_pos = agent.get_next_path_position()
+      var move_dir = global_position.direction_to(move_pos)
+      # adding delta changes it from "per second" movement to "per frame" movement
+      var movement = move_dir * move_speed * delta
+
+      translate(movement)
+
+    # temp function, for demonstration purposes
+    # sets target position when scene is loaded
+    func _ready():
+      set_move_to_target(Vector2.ZERO)
+
+    # sts target position on NavigationAgent2D and tells it to calculate a path to that target and resets the attack target, since unit is being commanded to move
+    func set_move_to_target(target: Vector2):
+      agent.target_position = target
+      attack_target = null
+  ```
+</details>
+
+<details><summary>11B. Ensure smooth movement</summary>
+
+  - Select NavigationAgent2D, go to inspector, and adjust the "Path Desired Distance" and "Target Desired Distance" properties to lower values (5.0 px)
+    - "Path Desired Distance"
+      - the distance threshold before a path point is considered to be reached, path position switches to the next point
+    - "Target Desired Distance"
+      - distance upon which it's considered reaching the target position 
+  - This will make unit switch to the next path position closer to the current position, resulting in smoother movement
+</details>
+
+<details><summary>11C. Prevent Jitterness during movement</summary>
+
+  - Unit may still jitter when reaching target position
+    - happens because unit continues to try to move; so need to stop movement when reaching target position
+  - In Unit.GD script,
+
+  ```gd
+    func _process(delta):
+      # returns true if unit reached target position, and stops movement
+      if not agent.is_navigation_finished():
+        _move(delta)
+  ```
+</details>
+
+## 12. Player Unit
+
+<details><summary></summary>
+  
 </details>
 
 <details><summary></summary>
