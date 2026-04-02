@@ -253,9 +253,40 @@
 </details>
 
 ## 12. Player Unit
+- Create units that can be selected by player
+- Inherited scene
+  - allows us to create new scene based on an existing one, inheriting all its properties and nodes
 
-<details><summary></summary>
+<details><summary>12A. Create player unit scene inherited from unit base scene</summary>
+
+  - Right-click on "unit_base" scene and select "New Inherited Scene"
+  - Save new scene as "unit_player"
+  - Open it and rename the root node as "Unit_Player"
+  - Set the "Team" property in inspector to "Player"
+</details>
+
+<details><summary>12B. Setup unit "selection" visual (so we know unit is selected; green rect. bar underneath unit)</summary>
   
+  - Add Sprite2D and rename to "SelectionVisual" (will serve as visual indicator when unit is selected)
+  - In the inspector, set "Texture" property to "New GradientTexture1D"
+  - Open the texture and remove any existing color stops to create flat color
+  - Set color to green
+  - In the editor, resize the node to desired size (should be rectangular box underneath unit)
+</details>
+
+<details><summary>12C. Implement unit selection</summary>
+
+  - Add `Node` as child of "Unit_Player" and rename to "PlayerUnit" (this will hold player-specific script)
+  - Add script, "player_unit.gd"
+  - Add code that has function for referencing the SelectionVisual sprite2d node and toggles it on and off
+
+  ```gd
+    extends Node
+    @onready var selection_visual = $"../SelectionVisual"
+
+    func toggle_selection_visual(toggle: bool):
+      selection_visual.visible = toggle
+  ```
 </details>
 
 <details><summary></summary>
