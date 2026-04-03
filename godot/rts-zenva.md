@@ -435,6 +435,98 @@
   ```
 </details>
 
+## 16. Attacking - 1
+- Attack functionality
+  - Handle movement towards target and initiate attacks when within range
+  - Ensure units can only attack enemies, not their own teammates
+  - Ensure attacks matches the defined attack rate (so attacks don't happen every single frame)
+
+<details><summary>16A. Implement targeting</summary>
+
+  ```gd
+  # inside unit.gd
+  func _process(delta):
+    # using nav.finished instead of is_target_reached, to prevent buggy movement
+    if not agent.is_navigation_finished():
+        _move(delta)
+
+    _target_check()
+
+  func _target_check():
+    if attack_target == null:
+        return
+
+    # calculate distance between unit and target positions
+    var dist = global_position.distance_to(attack_target.global_position)
+
+    # if within attack range, set nav agent target position to own unit position (to stop movement?) and then try to attack
+    if dist <= attack_range:
+        agent.target_position = global_position
+        _try_attack_target()
+    # else, move nav agent towards target enemy position
+    else:
+        agent.target_position = attack_target.global_position
+  ```
+</details>
+
+<details><summary>16B. Prevent attacking of own teammate (set_attack_target())</summary>
+
+  ```gd
+    func set_attack_target(target):
+      if target.team == team:
+          return
+
+      attack_target = target
+  ```
+</details>
+
+<details><summary>16C. Implement attacking according to attack rate</summary>
+
+  ```gd
+    func _try_attack_target():
+      var time = Time.get_unix_time_from_system()
+
+      # if not enough time has passed since last attack, then don't attack
+      if time - last_attack_time < attack_rate:
+         return
+
+      last_attack_time = time
+      attack_target.take_damage(attack_damage)
+  ```
+</details>
+
+## 17. Attacking - 2
+- features
+  - "taking damage" when attacked
+  - updating health
+  - checking when unit should be destroyed 
+
+<details><summary>17A. Implement "take_damage" function</summary>
+
+  ```gd
+  # in unit.gd
+
+  func take_damage(amount: int):
+    cur_hp -= amount
+    # notify other parts of game that unit has taken damage and send current health as parameter
+    OnTakeDamage.emit(cur_hp)
+
+    if cur_hp <= 0:
+        _die()
+  ```
+</details>
+
+<details><summary>17B. Implement unit "dying"</summary>
+
+  ```gd
+  # unit.gd
+  func _die():
+    OnDie.emit(self)
+    queue_free() # remove entity from game
+  ```
+</details>
+
+
 <details><summary></summary>
   
 </details>
