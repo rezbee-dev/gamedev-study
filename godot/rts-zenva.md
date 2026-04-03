@@ -289,6 +289,152 @@
   ```
 </details>
 
+## 13. Unit Controller 1
+
+- UnitController
+  - responsible for selecting and commanding player units for movement and attacking
+  - handles mouse click detection
+  - variables & functions
+    - `selected_unit`: Unit (keeps track of currently selected unit)
+    - `_input(event)`: handles input events (such as mouse clicks)
+    - `_try_select_unit()`: attempts to select a unit under the mouse cursor
+    - `_select_unit(unit: Unit)`: selects the specified unit
+    - `_unselect_unit()`: deselects currently selected unit
+    - `_try_command_unit()`: commands selected unit to move or attack
+    - `_get_selected_unit()`: return the unit under mouse cursor, if any
+     
+<details><summary>13A. Setup Unit Controller</summary>
+
+  - Add `Node2D` to main scene and rename to `UnitController`
+    - Using `Node2D` because we need access to 2D functionality for detecting mouse clicks 
+  - Add script to `UnitController`, labeled `unit_controller.gd`
+
+  ```gd
+    extends Node2D
+
+    var selected_unit : Unit
+
+    # get's called whenever input event (ex: mouse click, key press, etc) occurs
+    func _input (event):
+      pass
+
+    func _try_select_unit ():
+      pass
+
+    func _select_unit (unit : Unit):
+      pass
+
+    func _unselect_unit ():
+      pass
+
+    func _try_command_unit ():
+      pass
+
+    func _get_selected_unit () -> Unit:
+      return null
+  ```
+</details>
+
+<details><summary>13B. Implement function, `_get_selected_unit()` to return unit under mouse cursor, if any</summary>
+
+  ```gd
+    func _get_selected_unit() -> Unit:
+      # space = world that contains all 2D physics info and state
+      var space = get_world_2d().direct_space_state
+      # Defines object for performing query
+      var query = PhysicsPointQueryParameters2D.new()
+      # Sets position of query to current mouse position
+      query.position = get_global_mouse_position()
+      # by default, query does not include Area2D nodes, so set to true to allow detection of Area2D nodes (unit)
+      query.collide_with_areas = true
+      # perform the query and store its result in a variable
+      # returns the collider mouse is hovering over
+      var intersection = space.intersect_point(query, 1)
+
+      if intersection.is_empty():
+          return null
+
+      if intersection[0].collider is not Unit:
+          return null
+
+      # returns unit if query resolves to it
+      return intersection[0].collider
+  ```
+</details>
+
+<details><summary>13C. Implement left mouse for select unit</summary>
+
+  ```gd
+    func _input(event):
+      if event is InputEventMouseButton and event.pressed:
+          if event.button_index == MOUSE_BUTTON_LEFT:
+              _try_select_unit()
+          elif event.button_index == MOUSE_BUTTON_RIGHT:
+              _try_command_unit()
+
+    func _try_select_unit():
+      var unit = _get_selected_unit()
+
+      if unit == null or unit.team != Unit.Team.PLAYER:
+          _unselect_unit()
+      else:
+          _select_unit(unit)
+  ```
+</details>
+
+## 14. Unit Controller 2
+- Implement Unit Selection and Command functionality
+- Selecting Unit
+  - unselects currently selected unit
+  - set the selected unit to the unit that was clicked
+  - Enable selection visual
+- Unselecting Unit
+  - Check if there is a currently selected unit
+  - If there is one, then disable it's selction visual
+  - Set `selected_unit` variable to null
+- Commanding Unit (attack target or move to mouse position)
+  - triggered when player right clicks with mouse
+  - check if there is a selected unit; if mot then exit function
+  - get the target unit (that was right-clicked on)
+  - either command unit to attack target or move to mouse position
+
+<details><summary>14A. Implement Selecting Unit</summary>
+
+  ```gd
+    func _select_unit(unit: Unit):
+      _unselect_unit()
+      selected_unit = unit
+      unit.get_node("PlayerUnit").toggle_selection_visual(true)
+  ```
+</details>
+
+<details><summary>14B. Implement Unselecting Unit</summary>
+
+  ```gd
+    func _unselect_unit():
+      if selected_unit != null:
+          selected_unit.get_node("PlayerUnit").toggle_selection_visual(false)
+      selected_unit = null
+  ```
+</details>
+
+<details><summary>14C. Implement Commanding Unit</summary>
+
+  ```gd
+    func _try_command_unit():
+      if selected_unit == null:
+          return
+
+      var target = _get_selected_unit()
+
+      if target != null:
+          if target.team != Unit.Team.PLAYER:
+              selected_unit.set_attack_target(target)
+      else:
+          selected_unit.set_move_to_target(get_global_mouse_position())
+  ```
+</details>
+
 <details><summary></summary>
   
 </details>
