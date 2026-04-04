@@ -558,6 +558,24 @@
   ```
 </details>
 
+## 19. Enemy AI
+- Objectives
+  - Create enemy scene based on unit_base scene
+  - Adjust parameters to make it look and behave differently than player units
+  - implement functionality for detecting and pursuing the player
+  - Variables and functions
+    - detect_range : float
+    - detect_rate : float
+    - last_detect_time: float
+    - enemy_list: Array[Unit]
+    - _process(delta) - invoked every frame to update and call detect functions
+    - _detect() - detects enemies within range
+    - _update_enemy_list() - updates the list of enemy units
+ 
+<details><summary></summary>
+  
+</details>
+
 <details><summary></summary>
   
 </details>
