@@ -526,6 +526,37 @@
   ```
 </details>
 
+## 18. Health Bar
+- Objectives
+  - Setup code for health bar and attach it to the "healthbar" node in "unit_base" scene
+  - Ensure health bar is only visible when unit has taken damage
+  - Healthbar should reflect unit's current health and reduce when unit takes damage
+  - variables & functions
+    - "unit: Unit" - references the Unit health bar is attached to
+    - "_ready()" called at start of game when node is initialized
+    - "_update_value(health: int)" updates health bar's value based on unit's health
+
+<details><summary>18A. Implement health bar</summary>
+
+  ```gd
+  # inside unit_healthbar.gd, attached to health bar in unit_base scene
+
+  extends ProgressBar
+
+  @onready var unit : Unit = get_parent()
+
+  func _ready():
+    max_value = unit.max_hp
+    value = max_value
+    visible = false
+
+    unit.OnTakeDamage.connect(_update_value)
+
+  func _update_value(health: int):
+    value = health
+    visible = value < max_value
+  ```
+</details>
 
 <details><summary></summary>
   
