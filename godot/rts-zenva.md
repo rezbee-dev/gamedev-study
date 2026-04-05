@@ -562,6 +562,13 @@
 - Objectives
   - Create enemy scene based on unit_base scene
   - Adjust parameters to make it look and behave differently than player units
+    - Move Speed: 30
+    - Cur Hp: 20
+    - Max Hp: 20
+    - Attack Range: 30
+    - Attack Rate: 0.7 (slower than player)
+    - Attack Damage: 5
+    - Team: AI
   - implement functionality for detecting and pursuing the player
   - Variables and functions
     - detect_range : float
@@ -572,8 +579,101 @@
     - _detect() - detects enemies within range
     - _update_enemy_list() - updates the list of enemy units
  
-<details><summary></summary>
+<details><summary>19A. Setup Enemy Unit and set its parameters</summary>
+
+  - Right click on "unit_base" scene and select "New Inherited Scene"; save new scene as "unit_ai"
+  - Select sprite node and change texture to enemy texture
+  - Adjust unit params in the inspector
+    - Move Speed: Increase to 30.
+    - Health: Keep at 20.
+    - Attack Range: Set to 30.
+    - Attack Rate: Set to 0.7 (slower than the player).
+    - Attack Damage: Set to 5.
+    - Team: Change to AI.
+  - Create & add new node to scene
+    - Rename to AI
+    - create new script and attach to it, "unit_ai.gd" 
+</details>
+
+<details><summary>19B. Add Scene group (tags) for Unit, UnitPlayer, and UnitAI and apply to unit scenes</summary>
+
+  - Go to "unit_base" scene
+    - Select "Node" then "Groups" where inspector window is
+    - Click the "+" button
+    - Add group "Unit"
+  - Go to "unit_player" scene
+    - Add group "UnitPlayer"
+  - Go to "unit_ai" scene
+    - Add group "UnitAI"   
+</details>
+
+<details><summary>19C. Implement enemy script (implement detect player)</summary>
+
+  ```gd
+    # unit_ai.gd from "unit_ai" scene
+    extends Node
+
+    @export var detect_range : float = 100.0
+    # prevent detection happening every frame, saving performance costs
+    @export var detect_rate : float = 0.2
+    var last_detect_time : float
+    var enemy_list : Array[Unit] = []
+
+    @onready var unit : Unit = get_parent()
+
+    # checks if enough time has elapsed since last detection & invokes other functions
+    func _process(delta):
+      var time = Time.get_unix_time_from_system()
+
+      if time - last_detect_time > detect_rate:
+          last_detect_time = time
+          _update_enemy_list()
+          _detect()
+
+    # Clears current enemy list, and adds all player units to it
+    # searches for all units and adds the ones that are "player"
+    func _update_enemy_list():
+      enemy_list.clear()
+
+      var raw_list = get_tree().get_nodes_in_group("UnitPlayer")
+
+      # check if node is unit or not
+      for node in raw_list:
+          if node is not Unit:
+              continue
+
+          enemy_list.append(node)
+
+    # determines whether unit in enemy list is within range
+    func _detect ():
+      pass
+  ```
+</details>
+
+## 20. Enemy Unit - 2
+
+<details><summary>20A. implement enemy detection of player units and find the closest one to attack</summary>
+
+  ```gd
+    # inside unit_ai.gd
+
+    func _detect():
+      var closest_enemy = null
+      var closest_dist = 999999
+
+      for enemy in enemy_list:
+        var dist = unit.global_position.distance_to(enemy.global_position)
   
+        if dist > detect_range:
+          continue 
+  
+        if dist < closest_dist:
+          closest_enemy = enemy
+          closest_dist = dist
+
+      if closest_enemy != null:
+        unit.set_attack_target(closest_enemy)
+  ```
 </details>
 
 <details><summary></summary>
