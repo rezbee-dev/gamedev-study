@@ -676,7 +676,128 @@
   ```
 </details>
 
-## 22. Unit Visual - 1
+## 22-23. Unit Visual
+
+- Objectives
+  - Add damage flash effect
+  - Add slight rotation effect to simulate movement
+  - flip sprite based on direction of movement
+  - Variables & Functions
+    - unit: Unit - unit entity
+    - unit_pos_last_frame: Vector2
+    - _ready() - connect damage flash function to onTakeDamage signal
+    - _process(delta)
+    - _damage_flash(health: int) - cause sprite to flash red briefly    
+
+<details><summary>22A. Change unit origin point from center to feet</summary>
+
+  - Select "Unit_Base" sprite from "unit_base" scene
+  - Over in inspector, change Y value in "Offset" to be -8.0px and set Y value in Position to 8.0px
+</details>
+
+<details><summary>22B. Implement damage flash effect and rotational movement</summary>
+
+  - Select sprite node in "unit_base" scene and add script, "unit_visual.gd"
+
+  ```gd
+    extends Sprite2D
+
+    @onready var unit : Unit = get_parent()
+
+    var unit_pos_last_frame : Vector2
+
+    func _ready():
+        unit.OnTakeDamage.connect(_damage_flash)
+
+    func _process(delta):
+      var time = Time.get_unix_time_from_system()
+
+      # calc the rotation value using a sine wave
+      # multiplication causes rotation to be quicker
+      var r = sin(time * 10) * 5
+
+      # stops rotation if unit not moving
+      if unit.global_position.distance_to(unit_pos_last_frame) == 0:
+          r = 0
+
+      # applies rotation to sprite & convert rotation from degrees to radians
+      rotation = deg_to_rad(r)
+
+      # updates units last frame position
+      unit_pos_last_frame = unit.global_position
+
+    func _damage_flash(health : int):
+      modulate = Color.RED
+      await get_tree().create_timer(0.05).timeout
+      modulate = Color.WHITE
+  ```
+</details>
+
+<details><summary>22C. Implment sprite flip based on direction of movement</summary>
+
+  ```gd
+    # inside unit_visual.gd
+    extends Sprite2D
+
+    @onready var unit : Unit = get_parent()
+
+    var unit_pos_last_frame : Vector2
+
+    func _ready ():
+        unit.OnTakeDamage.connect(_damage_flash)
+
+    func _process (delta):
+        var time = Time.get_unix_time_from_system()
+        var r = sin(time * 10) * 5
+
+        if unit.global_position.distance_to(unit_pos_last_frame) == 0:
+            r = 0
+
+        rotation = deg_to_rad(r)
+
+        # flip sprite based on move direction
+        var dir = unit.global_position.x - unit_pos_last_frame.x
+
+        if dir > 0:
+            flip_h = false
+        elif dir < 0:
+            flip_h = true
+
+        unit_pos_last_frame = unit.global_position
+
+    func _damage_flash (health : int):
+        modulate = Color.RED
+        await get_tree().create_timer(0.05).timeout
+        modulate = Color.WHITE
+  ```
+</details>
+
+## 24. Audio
+
+<details><summary>24A. Implement sound effect for when unit takes damage</summary>
+
+  - Add AudioStreamPlayer to unit_base scene
+  - Create script "unit_audio.gd" and attach it to the player
+
+  ```gd
+    extends AudioStreamPlayer
+
+    # this will make the variable show up in the inspector
+    # drag and drop the "take_damage_sfx" sound file to it
+    @export var take_damage_sfx : AudioStream
+
+    func _play_sound(audio : AudioStream):
+      stream = audio
+      play()
+
+    func _play_take_damage_sfx(health : int):
+      _play_sound(take_damage_sfx)
+
+    func _ready():
+      var unit = get_parent()
+      unit.OnTakeDamage.connect(_play_take_damage_sfx)
+  ```
+</details>
 
 
 <details><summary></summary>
