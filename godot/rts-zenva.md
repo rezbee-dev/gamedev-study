@@ -856,3 +856,84 @@
       zoom.y = z
   ```
 </details>
+
+## 27. Winning/ Ending Game
+
+<details><summary>Objectives</summary>
+
+  - Set up "game manager" that will be responsible for detecting when game has been won
+    - Win condition: when one team is sole remaining team with units in the game
+  - Game manager will also keep track of units and teams
+    - Team name
+    - Unit count 
+</details>
+
+<details><summary>27A. Setup "game manager" for detecting when game ends</summary>
+
+  - Select main node in main scene (Node2D)
+  - Attach script, "game_manager.gd"
+</details>
+
+<details><summary>27B. Track units in game </summary>
+
+  ```gd
+    # inside game_manager.gd
+
+    extends Node2D
+
+    var units = {
+        Unit.Team.PLAYER: 0,
+        Unit.Team.AI: 0
+    }
+
+    func _ready():
+      for unit in get_tree().get_nodes_in_group("Unit"):
+          if unit is not Unit:
+              continue
+  
+          units[unit.team] += 1
+          unit.OnDie.connect(_on_unit_die)
+  ```
+</details>
+
+<details><summary>27C. Modify unit counts on unit deaths</summary>
+
+  ```gd
+    # game_manager.gd
+
+    #....
+
+    func _on_unit_die(unit: Unit):
+      units[unit.team] -= 1
+      _check_win_condition()
+  ```
+</details>
+
+<details><summary>2C. Check if game is won/over</summary>
+
+  ```gd
+    # game_manager.gd
+
+    #....
+
+    func _check_win_condition():
+      var winner = 0
+      var teams_alive = 0
+  
+      for team in units:
+          if units[team] > 0:
+              teams_alive += 1
+              winner = team
+  
+      if teams_alive > 1:
+          return
+  
+      var team_name = Unit.Team.keys()[winner]
+      print(team_name + " team has won!")
+  ```
+</details>
+
+<details><summary></summary>
+
+  - 
+</details>
