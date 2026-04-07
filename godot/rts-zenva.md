@@ -799,7 +799,60 @@
   ```
 </details>
 
+## 25. Camera Controller
 
-<details><summary></summary>
-  
+<details><summary>25A. Setup Input Map for controlling camera</summary>
+
+  - Go to Project > Project Settings.
+  - Navigate to the Input Map tab.
+  - Add the following new actions:
+    - cam_left
+    - cam_right
+    - cam_up
+    - cam_down
+    - zoom_in
+    - zoom_out
+  - Assign the following keys to the actions:
+    - cam_left: A
+    - cam_right: D
+    - cam_up: W
+    - cam_down: S
+    - zoom_in: Mouse Wheel Up
+    - zoom_out: Mouse Wheel Down
+</details>
+
+<details><summary>25B. Setup camera contollable by player (w/ zoom)</summary>
+
+  - Add camera node to main scene (if not already present)
+  - Create and attach script "camera_controller.gd" to it
+
+  ```gd
+    extends Camera2D
+
+    @export var move_speed : float = 70.0
+    @export var zoom_amount : float = 0.2
+
+    func _process(delta):
+      _move(delta)
+      _zoom(delta)
+
+    # add input vector to the camera’s global position, scaled by the delta value and the move_speed variable
+    # smoothly moves the camera in the desired direction, taking into account the time elapsed since the last frame
+    func _move(delta):
+      var input = Input.get_vector("cam_left", "cam_right", "cam_up", "cam_down")
+      # zoom mod for allowing camera movement to be slow when zoomed in, and fast when zoomed out 
+      var zoom_mod = 6.0 - zoom.x
+      global_position += input * delta * move_speed * zoom_mod
+
+    func _zoom(delta):
+      var z = zoom.x
+      if Input.is_action_just_released("zoom_in"):
+          z += zoom_amount
+      elif Input.is_action_just_released("zoom_out"):
+          z -= zoom_amount
+      # restricts zoom level to 1.0 to 5.0
+      z = clamp(z, 1.0, 5.0)
+      zoom.x = z
+      zoom.y = z
+  ```
 </details>
