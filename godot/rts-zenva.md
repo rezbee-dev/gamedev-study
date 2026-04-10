@@ -909,7 +909,7 @@
   ```
 </details>
 
-<details><summary>2C. Check if game is won/over</summary>
+<details><summary>27C. Check if game is won/over</summary>
 
   ```gd
     # game_manager.gd
@@ -930,6 +930,72 @@
   
       var team_name = Unit.Team.keys()[winner]
       print(team_name + " team has won!")
+  ```
+</details>
+
+## 28. End Screen
+
+<details><summary>28A. Create End Screen menu overlay</summary>
+
+  - Add `CanvasLayer` node to main scene
+  - Add as child, `Panel` and rename to "EndScreen"
+  - Make panel fill entire screen
+    - Go to Layout
+    - Anchors Preset
+    - Full Rect
+  - Style panel to Green color
+    - Thenes Overrides
+    - Style
+    - Add `StyleBoxFlat`
+    - Change color to `#4faf79`
+  - Add text to display winning team
+    - To `EndScreen`, add as child `Label` node renamed as "HeaderText"
+    - Set text to "PLAYER team has won!"
+  - Center the Text
+    - With "HeaderText" selected, go to "Layout" in inspector
+    - Change "Layout Mode" to "anchors"
+    - Set "achors preset" to "center"
+    - Set both horizontal and vertical alignment to Center
+  - Alter font
+    - Make new "LabelSettings"
+    - Set fontsize to 32
+    - Add shdow to text (1px size with 2px offset on both axes
+  - Add Menu Button
+    - Add button as child of "Endscreen" panel, and rename to "MenuButton"
+    - Set text to Menu
+    - Resize and position button under text
+  - Center the button
+    - Go to Layout
+    - Change Layout mode to Anchors
+    - Set "Anchors Preset" to Center  
+</details>
+
+<details><summary>28B. Add script for implementing end screen functionality</summary>
+
+  - Create new script "end_screen.gd" and attach it to "EndScreen" Panel
+  - After creating script, connect menu button
+    - Select Menu Button
+    - Go to "Node" tab in inspector
+    - Under signals, conenct "pressed()" signal to `_on_menu_button_pressed()"` function in `end_screen.gd` script
+  - Update game manager script, to display end screen when game is won or lost
+    - Open `game_manager.gd` script
+    - add variable,  `@onready var end_screen = $CanvasLayer/EndScreen`
+    - In `check_win_condition()`, instead of priniing win to console, put the following, `end_screen.set_screen(team_name)`
+  - Test end screen
+    - Toggle `EndScreen` panel visibility off in node menu
+    - Play game and lose or win, to see if end screen appears 
+
+  ```gd
+    extends Panel
+
+    @onready var header_text : Label = $HeaderText
+    
+    func set_screen (winning_team : String):
+      visible = true
+      header_text.text = winning_team + " team has won!"
+
+    func_on_menu_button_pressed():
+      pass
   ```
 </details>
 
