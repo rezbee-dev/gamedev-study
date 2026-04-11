@@ -999,6 +999,74 @@
   ```
 </details>
 
+## 29. Menu
+
+<details><summary>29A. Create Game Menu</summary>
+
+  - Go to the Scene menu and select New Scene.
+    - Set the scene type to User Interface.
+    - Rename the root node to Menu.
+    - Save the scene as Menu.tscn in your project folder.
+  - Add background image
+    - Add as child, TextureRect and rename as Background
+    - Drag and Drop "menu_background.png" into Texture property
+    - If background image does not fill the screen,
+      - Change Layout Mode to Anchors
+      - Set the Anchor Presets to Full Rect
+  - Add Game Title
+    - Add as child to Menu, `Label`, and rename as "Title"
+    - Set text to "Real Time Strategy Game"
+    - Create new Label settings
+      - Increase font size to 42
+      - Enable Shadow (1px, 2px offset both axes) and Outline (3px) options
+      - Set horizontal and vertical alignments to center
+      - Set Layout mode to Anchors
+      - Set Anchors Preset to Center
+      - Resize and position the text as needed  
+</details>
+
+<details><summary>29B. Add Play & Quit buttons</summary>
+
+  - Add to `Menu`, a Button node and rename to "PlayButton"
+    - set text to "Play"
+    - Change Layout mode to Anchors, and set anchor presets to Center
+    - Resize and position the button under the title
+  - Duplicate the button and rename to "QuitButton"
+    - Set text to "Quit"
+    - Adjust the position to be below the "Play" button  
+</details>
+
+<details><summary>29C. Implement button functionalities</summary>
+
+  - Select "Menu" node and attach script, "menu.gd"
+  - Connect the button signals
+    - Select the PlayButton node.
+    - Go to the Node tab and find the pressed() signal.
+    - Connect the signal to the Menu node and select the _on_play_button_pressed function.
+    - Repeat the process for the QuitButton and connect it to the _on_quit_button_pressed function.
+   
+  ```gd
+    extends Control
+
+    func _on_play_button_pressed():
+      get_tree().change_scene_to_file("res://Scenes/main.tscn")
+    
+    func _on_quit_button_pressed():
+      get_tree().quit()
+  ```
+</details>
+
+<details><summary>29D. Add "Menu" functionality to End screen</summary>
+
+  ```gd
+    # inside end_screen.gd
+
+    func _on_menu_button_pressed():
+      get_tree().change_scene_to_file("res://Scenes/menu.tscn")
+  ```
+</details>
+
+
 <details><summary></summary>
 
   - 
