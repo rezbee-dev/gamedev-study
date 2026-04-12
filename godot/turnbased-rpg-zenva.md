@@ -70,7 +70,135 @@
       - can also move the texturerect node to the top in the scene hierarchy, which will cause other elements to be appear in front of it
 </details>
 
+## 6. Character Setup
 
+
+<details><summary>Description</summary>
+  
+  - Two characters: player and AI
+  - Both characters should be based on same scene
+  - Difference is whether it is player or ai and the direction it will be facing
+</details>
+
+<details><summary>6A. Setup Character Scene</summary>
+  
+  - Create new Node2D and rename to "Character"
+    - `Node2D` because we won't be moving the character around or using colliders
+  - Add sprite
+    - Drag the "dragon" sprite onto the Character node; rename to "Sprite"
+    - Set position to (0, 0) to center it
+    - Change origin of sprite
+      - Set y offset to -70
+  - Add AudioStreamPlayer as child of Character
+  - Add script to Character; rename to `character.gd` 
+</details>
+
+## 8. Game Manager Script
+
+**8A. Setup "Next Turn" functionality**
+- Setup game_manager.gd on main root node (responsible for handling game state, managing turns, and game over screens)
+- Create function handles switching turns between player and AI
+  - Check if game is over (state)
+  - Call `end_turn()` for current character (player or AI)
+  - Set the current character to the opposite character
+  - Call `begin_turn()` for new current character
+
+<details><summary>8A. Solution</summary>
+  
+
+  ```gd
+    extends Node2D
+    
+    @export var player_character : Character
+    @export var ai_character : Character
+    var current_character : Character
+    
+    var game_over : bool = false
+
+    func next_turn():
+      if game_over:
+        return
+    
+      if current_character != null:
+        current_character.end_turn()
+    
+      if current_character == ai_character or current_character == null:
+        current_character = player_character
+      else:
+        current_character = ai_character
+    
+      current_character.begin_turn()
+  ```
+</details>
+
+**8B. Handle player or AI actions during their turns**
+- if Player turn
+  - Enable player UI (use placeholder for now)
+    - cast combat action based on player choice from UI 
+- If AI turn
+  - add artificial wait times (0.5 - 1.5 seconds) during turn and after turn (0.5) seconds
+  - disable player UI if still active
+  - cast combat action (placeholder for now)   
+
+<details><summary>8B. Solution</summary>
+  
+  ```gd
+    # updated from previous game_manager.gd
+    func next_turn():
+      if game_over:
+        return
+    
+      if current_character != null:
+        current_character.end_turn()
+    
+      if current_character == ai_character or current_character == null:
+        current_character = player_character
+      else:
+        current_character = ai_character
+    
+      current_character.begin_turn()
+    
+      if current_character.is_player:
+        # Enable and set player UI
+        pass # Placeholder for enabling player UI
+      else:
+        # Disable player UI if still active from the previous turn
+        # Generate a wait time between 0.5 and 1.5 seconds
+        var wait_time = randf_range(0.5, 1.5)
+        await get_tree().create_timer(wait_time).timeout
+        # Cast combat action (to be implemented)
+        await get_tree().create_timer(0.5).timeout
+        next_turn()
+   ```
+</details>
+
+**8C. Handle player casting combat action**
+- Function that implements the action chosen from player UI during player turn
+- Checks if current_character == player; if not, then exit
+- Call `.cast_combat_function)` based on the `action` passed to the method
+- Disable player UI (placeholder for now)
+- Create delay of 0.5 seconds
+- call next_turn()
+
+<details><summary>8C. Solution</summary>
+  
+  ```gd
+    # updated from previous game_manager.gd
+    func player_cast_combat_action(action : CombatAction):
+      if player_character != current_character:
+        return
+    
+      player_character.cast_combat_action(action, ai_character)
+      # Disable player UI
+      await get_tree().create_timer(0.5).timeout
+      next_turn()
+  ```
+</details>
+
+<details><summary></summary>
+  
+  - 
+</details>
 
 <details><summary></summary>
   
