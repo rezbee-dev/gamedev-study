@@ -84,6 +84,7 @@
   
   - Create new Node2D and rename to "Character"
     - `Node2D` because we won't be moving the character around or using colliders
+    - save as scene "character.tscn" to scene folder
   - Add sprite
     - Drag the "dragon" sprite onto the Character node; rename to "Sprite"
     - Set position to (0, 0) to center it
@@ -195,24 +196,234 @@
   ```
 </details>
 
-<details><summary></summary>
+## 9. Turns 
+
+**9A. Setup Characters**
+- Add Player and Computer Characters to main scene
+  - Player character needs to be marked as "player"
+  - both characters need to face each other and be positioned on opposite side and horizontally aligned
+- Assign characters to game_manager scripts
+<details><summary>9A. Solution</summary>
   
-  - 
+  - Add Player character to main scene
+    - position to -230 on x-axis
+    - rename to "player_character"
+    - enable "is_player" variable on inspector
+  - Add Computer character to main scene
+    - position to 230 on x-axis
+    - rename to "ai_character"
+    - under sprite in inspector, set "flip h" (?)
+  - Assign to game manager
+    - select game manager
+    - drag and drop both characters to the appropiate character fields in the inspector 
 </details>
 
-<details><summary></summary>
+****
+
+<details><summary>9B. Modify game_manager script to call `next_turn()` at the start of the game</summary>
+
+  ```gd
+    # game_manager.gd
+
+    func _ready():
+        next_turn()
+  ```
+</details>
+
+## 11. Combat Actions 1
+
+Combat actions
+- defines various moves (ex: healing, attacking, etc)
+- can be assigned to characters
+
+Resources
+- piece of data that can be saved to your game files and accessed whenever needed
+
+**11A. Create Combat Action Script for resources**
+- display_name: A string that represents the name of the combat action displayed in the UI.
+- description: A string that explains what the combat action does.
+- melee_damage: An integer that defines how much damage the combat action deals.
+- heal_amount: An integer that defines how much health the combat action restores.
+- base_weight: An integer that determines the likelihood of the AI choosing this action. Higher values increase the chance.
+
+<details><summary>11A. Solution</summary>
   
-  - 
+  ```gd
+    # combat_action.gd, saved into Scripts folder
+    class_name CombatAction
+    extends Resource
+    
+    @export var display_name : String
+    @export var description : String
+    
+    @export var melee_damage : int = 0
+    @export var heal_amount : int = 0
+    
+    @export var base_weight : int = 100
+  ```
+</details>
+
+**11B. Create "Slash" combat action resource**
+- should deal 8 melee damage
+
+<details><summary>11B. Solution</summary>
+  
+  - Right-click on the combat_actions folder.
+    - Select New Resource.
+    - Search for and select CombatAction.
+    - Name the new resource Slash.
+  - Double-click on the Slash resource to open it in the inspector. Fill in the properties as follows:
+    - display_name: Slash
+    - description: Deal 8 damage
+    - melee_damage: 8
+    - heal_amount: 0
+</details>
+
+<details><summary>11C. Create "Heal" action that heals for 10</summary>
+  
+  - Right-click on the combat_actions folder.
+    - Select New Resource.
+    - Search for and select CombatAction.
+    - Name the new resource Heal.
+  - Double-click on the "Heal" resource to open it in the inspector. Fill in the properties as follows:
+    - display_name: Heal
+    - description: Heal for 10 hit points
+    - melee_damage: 0
+    - heal_amount: 10
+</details>
+
+<details><summary>11D. Create "Heavy Hit" action that damages for 15 and is more desirable for AI to choose</summary>
+  
+  - Right-click on the combat_actions folder.
+    - Select New Resource.
+    - Search for and select CombatAction.
+    - Name the new resource HeavyHit.
+  - Double-click on the "HeavyHit" resource to open it in the inspector. Fill in the properties as follows:
+    - display_name: Heavy Hit
+    - description: Deal 15 damage
+    - melee_damage: 15
+    - heal_amount: 10
+    - Base Weight: 150
+</details>
+
+<details><summary>11E. Apply combat actions to Characters</summary>
+  
+  - Open `character.gd` script, and in the variable section, add the following: `@export var combat_actions : Array[CombatAction]`
+  - Assign combat action to Player and Computer characters by doing the following,
+    - Select each character in the scene.
+    - Find the Combat Actions array in the inspector.
+    - Set the size of the array to 3.
+    - Drag and drop the Heal, HeavyHit, and Slash actions into the array.
+</details>
+
+<details><summary>11F. Update `game_manager.gd` script so AI casts combat action</summary>
+  
+  ```gd
+    # updated from previous game_manager.gd
+    func next_turn():
+      if game_over:
+        return
+    
+      if current_character != null:
+        current_character.end_turn()
+    
+      if current_character == ai_character or current_character == null:
+        current_character = player_character
+      else:
+        current_character = ai_character
+    
+      current_character.begin_turn()
+    
+      if current_character.is_player:
+        # Enable and set player UI
+        pass # Placeholder for enabling player UI
+      else:
+        # Disable player UI if still active from the previous turn
+        # Generate a wait time between 0.5 and 1.5 seconds
+        var wait_time = randf_range(0.5, 1.5)
+        await get_tree().create_timer(wait_time).timeout
+        # new addition:
+        var action_to_cast = ai_decide_combat_action()
+        ai_character.cast_combat_action(action_to_cast, player_character)
+        await get_tree().create_timer(0.5).timeout
+        next_turn()
+   ```
+</details>
+
+## 13. Combat Actions UI
+
+<details><summary>13A. Setup Panel for player to select combat actions, that is positioned to bottom of screen</summary>
+  
+  - Add `CanvasLayer` node
+    - add as child, `Panel` and rename to "CombatActionsUI"
+      - set size to 450x155 px 
+      - Change anchoring presets to `CenterBottom`  
+</details>
+
+**13B. Create UI Panel for Player**
+- Left half: list of buttons representing different combat actions
+- Right half: a description text that provides details about the selected action
+
+<details><summary>13B. Solution</summary>
+  
+  - Add `VBoxContainer` node as child of "CombatActionsUI"
+    - rename to "ButtonContainer"
+    - Position to be on the left half side
+    - Add buttons (as placeholders, they will be changed later)
+  - Add `RichTextLabel` as child to "CombatActionsUI"
+    - Rename to "Description"
+    - Position to be on right half of panel
+    - Enable `BBCode` to allow for formatting (ex: bold)
+    - Note: In case you find that the default font is blurry, go to the project settings and search for ‘msdf’. Under GUI -> Theme, turn on ‘default_font_multichannel_signed_distance_field’
 </details>
 
 
+<details><summary>13C. Setup "Combat Action Buttons" in panel w/ code that sets the combat action (?)</summary>
 
+  - Delete the buttons under "ButtonContainer" except one
+  - Rename it to "CombatActionButton"
+  - Create and attach new script, `combat_action_button.gd`
 
+  ```gd
+    extends Button
+    
+    class_name CombatActionButton
+    
+    var combat_action : CombatAction
+    
+    func set_combat_action(ca : CombatAction):
+        combat_action = ca
+        text = ca.display_name
+  ```
 
+  - Duplicate buttons, except for the last one, rename to "PassTurnButton" and remove the script from it
+</details>
 
+**13D. Setup script for UI panel**
+- Reference UI elements (Buttons, label text)
+- Reference game manager
 
+<details><summary>13D. Solution</summary>
 
+  ```gd
+    extends Panel
+    
+    @onready var button_container = $ButtonContainer
+    var ca_buttons : Array[CombatActionButton]
+    
+    @onready var description_text : RichTextLabel = $Description
+    @onready var game_manager = $"../.."
+  ```
+</details>
+<details><summary></summary>
 
+  - 
+</details>
+<details><summary></summary>
 
+  - 
+</details>
+<details><summary></summary>
 
-
+  - 
+</details>
