@@ -406,6 +406,7 @@ Resources
 <details><summary>13D. Solution</summary>
 
   ```gd
+    # combat_actions_ui.gd, attached to CombatActionsUI panel
     extends Panel
     
     @onready var button_container = $ButtonContainer
@@ -415,9 +416,74 @@ Resources
     @onready var game_manager = $"../.."
   ```
 </details>
-<details><summary></summary>
 
-  - 
+### 13E. Implement Combat Action Buttons
+- Select "CombatActionsUI" script, "combat_actions_ui.gd"
+- Upon start of game, connect all "CombatActionButton" nodes to functions, that execute when user triggers it (mouse press, mouse enter (hover), mouse exit)
+  - `_button_pressed (button : CombatActionButton)` - calls `game_manager.player_cast_combat_action(button.combat_action)`
+  - `_button_entered (button : CombatActionButton)` - updates "Description" node text to display combat action name and description
+  - `_button_exited (_button : CombatActionButton)` - clears "Description" node text
+
+<details><summary>13E. Solution</summary>
+
+  ```gd
+    # inside combat_actions_ui.gd
+
+    #.....
+    func _ready():
+        for child in button_container.get_children():
+            if child is not CombatActionButton:
+                continue
+    
+            ca_buttons.append(child)
+            child.pressed.connect(_button_pressed.bind(child))
+            child.mouse_entered.connect(_button_entered.bind(child))
+            child.mouse_exited.connect(_button_exited.bind(child))
+
+    func _button_pressed (button : CombatActionButton):
+    	game_manager.player_cast_combat_action(button.combat_action)
+    
+    func _button_entered (button : CombatActionButton):
+    	var ca = button.combat_action
+    	description_text.text = "[b]" + ca.display_name + "[/b]\n" + ca.description
+    
+    func _button_exited (_button : CombatActionButton):
+    	description_text.text = ""
+  ```
+</details>
+
+<details><summary>13F. Implement "PassTurnButton" pressed signal so it triggers the next turn</summary>
+
+  - Need to select "PassTurnButton" then connect the "pressed" signal from inspector to the "_on_pass_turn_button_pressed()" function, as implement below
+  ```gd
+    # inside combat_actions_ui.gd
+
+    #.....
+    func _on_pass_turn_button_pressed():
+      game_manager.next_turn()
+  ```
+</details>
+
+### 13G. Setup function to display correct combat actions for player
+- Need to create function that takes an array of combat actions, and assigns them to one by one to the buttons
+- if there are more buttons than combat actions, then the extra buttons should be disabled
+- Function will be called by "game_manager" script 
+<details><summary>13G. Solution</summary>
+
+  ```gd
+    # inside combat_actions_ui.gd
+
+    #.....
+    # will be called by game_manager.gd
+    func set_combat_actions(actions: Array[CombatAction]):
+      for i in len(ca_buttons):
+          if i >= len(actions):
+              ca_buttons[i].visible = false
+              continue
+  
+          ca_buttons[i].visible = true
+          ca_buttons[i].set_combat_action(actions[i])
+  ```
 </details>
 <details><summary></summary>
 
