@@ -72,7 +72,6 @@
 
 ## 6. Character Setup
 
-
 <details><summary>Description</summary>
   
   - Two characters: player and AI
@@ -104,33 +103,33 @@
   - Set the current character to the opposite character
   - Call `begin_turn()` for new current character
 
-<details><summary>8A. Solution</summary>
+  <details><summary>8A. Solution</summary>
+    
   
-
-  ```gd
-    extends Node2D
-    
-    @export var player_character : Character
-    @export var ai_character : Character
-    var current_character : Character
-    
-    var game_over : bool = false
-
-    func next_turn():
-      if game_over:
-        return
-    
-      if current_character != null:
-        current_character.end_turn()
-    
-      if current_character == ai_character or current_character == null:
-        current_character = player_character
-      else:
-        current_character = ai_character
-    
-      current_character.begin_turn()
-  ```
-</details>
+    ```gd
+      extends Node2D
+      
+      @export var player_character : Character
+      @export var ai_character : Character
+      var current_character : Character
+      
+      var game_over : bool = false
+  
+      func next_turn():
+        if game_over:
+          return
+      
+        if current_character != null:
+          current_character.end_turn()
+      
+        if current_character == ai_character or current_character == null:
+          current_character = player_character
+        else:
+          current_character = ai_character
+      
+        current_character.begin_turn()
+    ```
+  </details>
 
 **8B. Handle player or AI actions during their turns**
 - if Player turn
@@ -141,37 +140,37 @@
   - disable player UI if still active
   - cast combat action (placeholder for now)   
 
-<details><summary>8B. Solution</summary>
-  
-  ```gd
-    # updated from previous game_manager.gd
-    func next_turn():
-      if game_over:
-        return
+  <details><summary>8B. Solution</summary>
     
-      if current_character != null:
-        current_character.end_turn()
-    
-      if current_character == ai_character or current_character == null:
-        current_character = player_character
-      else:
-        current_character = ai_character
-    
-      current_character.begin_turn()
-    
-      if current_character.is_player:
-        # Enable and set player UI
-        pass # Placeholder for enabling player UI
-      else:
-        # Disable player UI if still active from the previous turn
-        # Generate a wait time between 0.5 and 1.5 seconds
-        var wait_time = randf_range(0.5, 1.5)
-        await get_tree().create_timer(wait_time).timeout
-        # Cast combat action (to be implemented)
-        await get_tree().create_timer(0.5).timeout
-        next_turn()
-   ```
-</details>
+    ```gd
+      # updated from previous game_manager.gd
+      func next_turn():
+        if game_over:
+          return
+      
+        if current_character != null:
+          current_character.end_turn()
+      
+        if current_character == ai_character or current_character == null:
+          current_character = player_character
+        else:
+          current_character = ai_character
+      
+        current_character.begin_turn()
+      
+        if current_character.is_player:
+          # Enable and set player UI
+          pass # Placeholder for enabling player UI
+        else:
+          # Disable player UI if still active from the previous turn
+          # Generate a wait time between 0.5 and 1.5 seconds
+          var wait_time = randf_range(0.5, 1.5)
+          await get_tree().create_timer(wait_time).timeout
+          # Cast combat action (to be implemented)
+          await get_tree().create_timer(0.5).timeout
+          next_turn()
+     ```
+  </details>
 
 **8C. Handle player casting combat action**
 - Function that implements the action chosen from player UI during player turn
@@ -181,20 +180,20 @@
 - Create delay of 0.5 seconds
 - call next_turn()
 
-<details><summary>8C. Solution</summary>
-  
-  ```gd
-    # updated from previous game_manager.gd
-    func player_cast_combat_action(action : CombatAction):
-      if player_character != current_character:
-        return
+  <details><summary>8C. Solution</summary>
     
-      player_character.cast_combat_action(action, ai_character)
-      # Disable player UI
-      await get_tree().create_timer(0.5).timeout
-      next_turn()
-  ```
-</details>
+    ```gd
+      # updated from previous game_manager.gd
+      func player_cast_combat_action(action : CombatAction):
+        if player_character != current_character:
+          return
+      
+        player_character.cast_combat_action(action, ai_character)
+        # Disable player UI
+        await get_tree().create_timer(0.5).timeout
+        next_turn()
+    ```
+  </details>
 
 ## 9. Turns 
 
@@ -203,22 +202,20 @@
   - Player character needs to be marked as "player"
   - both characters need to face each other and be positioned on opposite side and horizontally aligned
 - Assign characters to game_manager scripts
-<details><summary>9A. Solution</summary>
-  
-  - Add Player character to main scene
-    - position to -230 on x-axis
-    - rename to "player_character"
-    - enable "is_player" variable on inspector
-  - Add Computer character to main scene
-    - position to 230 on x-axis
-    - rename to "ai_character"
-    - under sprite in inspector, set "flip h" (?)
-  - Assign to game manager
-    - select game manager
-    - drag and drop both characters to the appropiate character fields in the inspector 
-</details>
-
-****
+  <details><summary>9A. Solution</summary>
+    
+    - Add Player character to main scene
+      - position to -230 on x-axis
+      - rename to "player_character"
+      - enable "is_player" variable on inspector
+    - Add Computer character to main scene
+      - position to 230 on x-axis
+      - rename to "ai_character"
+      - under sprite in inspector, set "flip h" (?)
+    - Assign to game manager
+      - select game manager
+      - drag and drop both characters to the appropiate character fields in the inspector 
+  </details>
 
 <details><summary>9B. Modify game_manager script to call `next_turn()` at the start of the game</summary>
 
@@ -246,38 +243,38 @@ Resources
 - heal_amount: An integer that defines how much health the combat action restores.
 - base_weight: An integer that determines the likelihood of the AI choosing this action. Higher values increase the chance.
 
-<details><summary>11A. Solution</summary>
-  
-  ```gd
-    # combat_action.gd, saved into Scripts folder
-    class_name CombatAction
-    extends Resource
+  <details><summary>11A. Solution</summary>
     
-    @export var display_name : String
-    @export var description : String
-    
-    @export var melee_damage : int = 0
-    @export var heal_amount : int = 0
-    
-    @export var base_weight : int = 100
-  ```
-</details>
+    ```gd
+      # combat_action.gd, saved into Scripts folder
+      class_name CombatAction
+      extends Resource
+      
+      @export var display_name : String
+      @export var description : String
+      
+      @export var melee_damage : int = 0
+      @export var heal_amount : int = 0
+      
+      @export var base_weight : int = 100
+    ```
+  </details>
 
 **11B. Create "Slash" combat action resource**
 - should deal 8 melee damage
 
-<details><summary>11B. Solution</summary>
-  
-  - Right-click on the combat_actions folder.
-    - Select New Resource.
-    - Search for and select CombatAction.
-    - Name the new resource Slash.
-  - Double-click on the Slash resource to open it in the inspector. Fill in the properties as follows:
-    - display_name: Slash
-    - description: Deal 8 damage
-    - melee_damage: 8
-    - heal_amount: 0
-</details>
+  <details><summary>11B. Solution</summary>
+    
+    - Right-click on the combat_actions folder.
+      - Select New Resource.
+      - Search for and select CombatAction.
+      - Name the new resource Slash.
+    - Double-click on the Slash resource to open it in the inspector. Fill in the properties as follows:
+      - display_name: Slash
+      - description: Deal 8 damage
+      - melee_damage: 8
+      - heal_amount: 0
+  </details>
 
 <details><summary>11C. Create "Heal" action that heals for 10</summary>
   
@@ -364,18 +361,18 @@ Resources
 - Left half: list of buttons representing different combat actions
 - Right half: a description text that provides details about the selected action
 
-<details><summary>13B. Solution</summary>
-  
-  - Add `VBoxContainer` node as child of "CombatActionsUI"
-    - rename to "ButtonContainer"
-    - Position to be on the left half side
-    - Add buttons (as placeholders, they will be changed later)
-  - Add `RichTextLabel` as child to "CombatActionsUI"
-    - Rename to "Description"
-    - Position to be on right half of panel
-    - Enable `BBCode` to allow for formatting (ex: bold)
-    - Note: In case you find that the default font is blurry, go to the project settings and search for ‘msdf’. Under GUI -> Theme, turn on ‘default_font_multichannel_signed_distance_field’
-</details>
+  <details><summary>13B. Solution</summary>
+    
+    - Add `VBoxContainer` node as child of "CombatActionsUI"
+      - rename to "ButtonContainer"
+      - Position to be on the left half side
+      - Add buttons (as placeholders, they will be changed later)
+    - Add `RichTextLabel` as child to "CombatActionsUI"
+      - Rename to "Description"
+      - Position to be on right half of panel
+      - Enable `BBCode` to allow for formatting (ex: bold)
+      - Note: In case you find that the default font is blurry, go to the project settings and search for ‘msdf’. Under GUI -> Theme, turn on ‘default_font_multichannel_signed_distance_field’
+  </details>
 
 
 <details><summary>13C. Setup "Combat Action Buttons" in panel w/ code that sets the combat action (?)</summary>
@@ -403,54 +400,54 @@ Resources
 - Reference UI elements (Buttons, label text)
 - Reference game manager
 
-<details><summary>13D. Solution</summary>
+  <details><summary>13D. Solution</summary>
+  
+    ```gd
+      # combat_actions_ui.gd, attached to CombatActionsUI panel
+      extends Panel
+      
+      @onready var button_container = $ButtonContainer
+      var ca_buttons : Array[CombatActionButton]
+      
+      @onready var description_text : RichTextLabel = $Description
+      @onready var game_manager = $"../.."
+    ```
+  </details>
 
-  ```gd
-    # combat_actions_ui.gd, attached to CombatActionsUI panel
-    extends Panel
-    
-    @onready var button_container = $ButtonContainer
-    var ca_buttons : Array[CombatActionButton]
-    
-    @onready var description_text : RichTextLabel = $Description
-    @onready var game_manager = $"../.."
-  ```
-</details>
-
-### 13E. Implement Combat Action Buttons
+**13E. Implement Combat Action Buttons**
 - Select "CombatActionsUI" script, "combat_actions_ui.gd"
 - Upon start of game, connect all "CombatActionButton" nodes to functions, that execute when user triggers it (mouse press, mouse enter (hover), mouse exit)
   - `_button_pressed (button : CombatActionButton)` - calls `game_manager.player_cast_combat_action(button.combat_action)`
   - `_button_entered (button : CombatActionButton)` - updates "Description" node text to display combat action name and description
   - `_button_exited (_button : CombatActionButton)` - clears "Description" node text
 
-<details><summary>13E. Solution</summary>
-
-  ```gd
-    # inside combat_actions_ui.gd
-
-    #.....
-    func _ready():
-        for child in button_container.get_children():
-            if child is not CombatActionButton:
-                continue
-    
-            ca_buttons.append(child)
-            child.pressed.connect(_button_pressed.bind(child))
-            child.mouse_entered.connect(_button_entered.bind(child))
-            child.mouse_exited.connect(_button_exited.bind(child))
-
-    func _button_pressed (button : CombatActionButton):
-    	game_manager.player_cast_combat_action(button.combat_action)
-    
-    func _button_entered (button : CombatActionButton):
-    	var ca = button.combat_action
-    	description_text.text = "[b]" + ca.display_name + "[/b]\n" + ca.description
-    
-    func _button_exited (_button : CombatActionButton):
-    	description_text.text = ""
-  ```
-</details>
+  <details><summary>13E. Solution</summary>
+  
+    ```gd
+      # inside combat_actions_ui.gd
+  
+      #.....
+      func _ready():
+          for child in button_container.get_children():
+              if child is not CombatActionButton:
+                  continue
+      
+              ca_buttons.append(child)
+              child.pressed.connect(_button_pressed.bind(child))
+              child.mouse_entered.connect(_button_entered.bind(child))
+              child.mouse_exited.connect(_button_exited.bind(child))
+  
+      func _button_pressed (button : CombatActionButton):
+      	game_manager.player_cast_combat_action(button.combat_action)
+      
+      func _button_entered (button : CombatActionButton):
+      	var ca = button.combat_action
+      	description_text.text = "[b]" + ca.display_name + "[/b]\n" + ca.description
+      
+      func _button_exited (_button : CombatActionButton):
+      	description_text.text = ""
+    ```
+  </details>
 
 <details><summary>13F. Implement "PassTurnButton" pressed signal so it triggers the next turn</summary>
 
@@ -464,26 +461,79 @@ Resources
   ```
 </details>
 
-### 13G. Setup function to display correct combat actions for player
+**13G. Setup function to display correct combat actions for player**
 - Need to create function that takes an array of combat actions, and assigns them to one by one to the buttons
 - if there are more buttons than combat actions, then the extra buttons should be disabled
 - Function will be called by "game_manager" script 
-<details><summary>13G. Solution</summary>
-
-  ```gd
-    # inside combat_actions_ui.gd
-
-    #.....
-    # will be called by game_manager.gd
-    func set_combat_actions(actions: Array[CombatAction]):
-      for i in len(ca_buttons):
-          if i >= len(actions):
-              ca_buttons[i].visible = false
-              continue
+  <details><summary>13G. Solution</summary>
   
-          ca_buttons[i].visible = true
-          ca_buttons[i].set_combat_action(actions[i])
-  ```
+    ```gd
+      # inside combat_actions_ui.gd
+  
+      #.....
+      # will be called by game_manager.gd
+      func set_combat_actions(actions: Array[CombatAction]):
+        for i in len(ca_buttons):
+            if i >= len(actions):
+                ca_buttons[i].visible = false
+                continue
+    
+            ca_buttons[i].visible = true
+            ca_buttons[i].set_combat_action(actions[i])
+    ```
+  </details>
+
+**13H. Connect Player UI to Game Manager**
+- Reference combat actions UI panel from game manager code
+- Toggle visibility of the panel based on whether it's the players turn or not
+  <details><summary>13H. Solution</summary>
+  
+    ```gd
+      # game_manager.gd
+      @onready var player_ui = $CanvasLayer/CombatActionsUI
+      
+      func next_turn():
+        if game_over:
+          return
+      
+        if current_character != null:
+          current_character.end_turn()
+      
+        if current_character == ai_character or current_character == null:
+          current_character = player_character
+        else:
+          current_character = ai_character
+      
+        current_character.begin_turn()
+      
+        if current_character.is_player:
+          player_ui.visible = true
+          player_ui.set_combat_actions(player_character.combat_actions)
+        else:
+          player_ui.visible = false
+          var wait_time = randf_range(0.5, 1.5)
+          await get_tree().create_timer(wait_time).timeout
+      
+          var action_to_cast = ai_decide_combat_action()
+          ai_character.cast_combat_action(action_to_cast, player_character)
+      
+          await get_tree().create_timer(0.5).timeout
+          next_turn()
+      
+      func player_cast_combat_action(action: CombatAction):
+        if player_character != current_character:
+          return
+      
+        player_character.cast_combat_action(action, ai_character)
+        player_ui.visible = false
+        await get_tree().create_timer(0.5).timeout
+        next_turn()
+    ```
+  </details>
+
+<details><summary></summary>
+
+  - 
 </details>
 <details><summary></summary>
 
