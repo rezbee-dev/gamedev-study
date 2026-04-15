@@ -531,10 +531,55 @@ Resources
     ```
   </details>
 
-<details><summary></summary>
+## 17. Health Bar
 
-  - 
+<details><summary>17A. Add red Health Bar below character, that displays current hp / total hp</summary>
+
+  - Open "character" scene
+  - Add child node, `ProgressBar` and rename to "HealthBar"
+  - Disable Show Percentage:
+    - In the inspector, uncheck the Show Percentage option.
+    - This will remove the percentage display, allowing us to show the actual health value.
+  - Resize the Progress Bar:
+    - Go to the Layout section and set the size.
+    - For example, you can set the X size to 212 and the Y size to 27.
+    - Adjust the position to place it below the character’s feet.
+  - Change Visual Style:
+    - Customize the visual appearance of the health bar.
+    - In the inspector, go to Theme Overrides > Styles.
+    - Create new style boxes for the background and fill, and set their colors.
+    - For example, set the background to a dark gray and the fill to red.
+  - Add Health text
+    - add as child to "HealthBar" node, `Label` node and rename to "HealthText"
+    - In the inspector, go to the Layout section and change the Layout Mode to Anchors.
+      - Set the Anchors Preset to Full Rect to make the text fill the bounds of the progress bar.
+    - Center the text by setting the Horizontal Alignment and Vertical Alignment to Center.
+    - Adjust the font size and add a shadow effect for better visibility.
+      - Go to Label Settings, create a new Label Settings resource, and adjust the font size and shadow color.
 </details>
+<details><summary>17B. Create script for Healthbar that updates the health</summary>
+
+  ```gd
+    # inside character_health_bar.gd, attached to HealthBar node
+    extends ProgressBar
+    
+    @onready var health_text : Label = $HealthText
+    
+    func _ready ():
+      var char = get_parent()
+      max_value = char.max_health
+      _update_value(char.cur_health)
+
+      # connect health bar to when character takes damage or heals
+      char.OnTakeDamage.connect(_update_value)
+      char.OnHeal.connect(_update_value)
+    
+    func _update_value (health : int):
+      value = health
+      health_text.text = str(health) + " / " + str(int(max_value))
+  ```
+</details>
+
 <details><summary></summary>
 
   - 
