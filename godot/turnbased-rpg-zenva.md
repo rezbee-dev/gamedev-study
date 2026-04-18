@@ -580,6 +580,119 @@ Resources
   ```
 </details>
 
+## 18. Casting Combat Actions
+
+**18A. Implement `cast_combat_action(action: CombatAction, opponent: Character)`**
+- function will determine whether to deal damage to opponent or heal the character based on the combat action chosen
+- the damage or heal amount must be greater than 0 to take effect
+- Implement error handling for `null` combat actions
+  
+  <details><summary>18A. Solution</summary>
+  
+    ```gd
+      # character.gd
+      func cast_combat_action (action : CombatAction, opponent : Character):
+        if action == null:
+          return
+  
+        if action.melee_damage > 0:
+          opponent.take_damage(action.melee_damage)
+      
+        if action.heal_amount > 0:
+          heal(action.heal_amount)
+    ```
+  </details>
+
+**18B. Implement `take_damage(amount: int):`**
+- subtracts the damage amount from character's current health
+- emits a signal to update the health bar
+- plays the "take_damage_sfx" sound effect
+  <details><summary>18B. Solution</summary>
+  
+    ```gd
+      # character.gd
+      func take_damage (amount : int):
+        cur_health -= amount
+        OnTakeDamage.emit(cur_health)
+        _play_audio(take_damage_sfx)
+    ```
+  </details>
+
+**18C. Implement `heal(amount:int)`**
+- add the "heal" amount to the character's current health
+- ensure heal amount does not exceed character's max health
+- emit signal to update health bar
+- plays heal sound effect
+  <details><summary>18C. Solution</summary>
+  
+    ```gd
+      # character.gd
+      func heal (amount : int):
+        cur_health += amount
+        cur_health = clamp(cur_health, 0, max_health)
+        OnHeal.emit(cur_health)
+        _play_audio(heal_sfx)
+    ```
+  </details>
+
+## 19. AI Combat
+
+- Weighted Randomness
+  - allows us to influence the likelihood of certain combat actions being chosen by AI
+  - Each action has a base weight that determines its default chance of being selected
+  - the higher the base weight, the more likely the action is to be chosen
+ 
+**19A. Implement AI decision Function**
+- Establish necessary variables.
+  - `weights: Array[int] = []` - keep track of weights
+  - `total_weight` 
+- Calculate the health percentages of the player and the AI.
+  - get the float percentage values of characer healths (ex: `30.53%`) 
+- Modify the weights based on health percentages.
+- Choose a random combat action based on the modified weights.
+
+  <details><summary></summary>
+  
+    ```gd
+      func ai_decide_combat_action () -> CombatAction:
+      	if ai_character != current_character:
+      		return null
+      	
+      	var ai = ai_character
+      	var player = player_character
+      	
+      	var actions = ai.combat_actions
+      	
+      	var weights : Array[int] = []
+      	var total_weight = 0
+      	
+      	var ai_health_perc = float(ai.cur_health) / float(ai.max_health)
+      	var player_health_perc = float(player.cur_health) / float(player.max_health)
+      	
+      	for action in actions:
+      		var weight : int = action.base_weight
+      		
+      		if player.cur_health <= action.melee_damage:
+      			weight *= 3
+      		if action.heal_amount > 0:
+      			weight *= 1 + (1 - ai_health_perc)
+      		
+      		weights.append(weight)
+      		total_weight += weight
+      	
+      	var cumulative_weight = 0
+      	var rand_weight = randi_range(0, total_weight)
+      	
+      	for i in len(actions):
+      		cumulative_weight += weights[i]
+      		
+      		if rand_weight < cumulative_weight:
+      			return actions[i]
+      	
+      	return null
+    ```
+  </details>
+
 <details><summary></summary>
 
   - 
