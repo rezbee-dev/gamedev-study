@@ -1,91 +1,173 @@
-# Godot Notes
+# 2D Platformer
 
-## 2D Platformer
 - [src: zenva](https://academy.zenva.com/lesson/introduction-458/?zva_less_compl=3579381)
 
-### Features
-- 2D, sidescroller platformer game
-- Player has to collect coins, avoid enemies, and reach end flag
-- Movement
-  - left, right, and jump
-  - Acceleration & braking for smooth movement
+## Game Design
+- Genre: 2D sidescrolling platformer
+- Player 
+  - Collects coins, avoids enemies, and reaches end flag to move to next level
+  - moves left, right, and jumps
+  - Smooth movement (Acceleration & braking)
+    <details><summary>image</summary>
+  
+    ![alt text](images/design1.png)
+  </details>
 - Enemies
-  - Move back and forth between two points
+  - Moves back and forth between two points
   - Damages player when hit
-- Player Damage
-  - health goes down by 1 (1 less heart)
-  - Screenflashes red
-  - Screenshake
-  - Damage sound
+    <details><summary></summary>
+
+      ![alt text](images/design2.png)
+    </details>
+- Damage
+  - health goes down by 1 heart
+  - Screen flashes red
+  - Screen shakes
+  - Damage sounds
 - Coins
   - increases score by 1 when collected
   - plays sound effect when collected
   - has rotating effect
   - bobs up and down
+    <details><summary>image</summary>
+
+      ![alt text](images/design4.png)
+    </details>
 - UI
-  -  Hearts for health
-  -  Score for coins collected
+  -  Health represented by hearts
+  -  Score denoted by number of coins collected
+      <details><summary>image</summary>
+
+        ![alt text](images/design3.png)
+      </details>
 - End flag
   - placed at the end of each level
   - when touched, it loads up next level
+    <details><summary>image</summary>
+
+      ![alt text](images/design5.png)
+    </details>
 - Menu
   - play button
-    - Loads level 1
   - quit button
+    <details><summary>image</summary>
+    
+      ![alt text](images/design6.png)
+    </details>
 
-### 5. Project Setup
 
-<details><summary>5A. Setup Project Folder</summary>
 
-- Project assets: [link](https://academy.zenva.com/wp-content/uploads/2025/02/Assets-Godot-2D-Platformer.zip)
-- Create Folders: Audio, Sprites, Scripts, and Scenes
-</details>
+## 1. Project Setup
 
-<details><summary>5B. Create Level 1 Scene</summary>
+**Create project folders:** 
+- Audio, Sprites, Scripts, and Scenes
+- Import assets into appropriate folders
+  - https://mega.nz/folder/tOdyiITJ#HHo_NvrW6vjup-Wh5bCyzQ
+  <details><summary>image</summary>
 
-- Initialize 2D scene by selecting "2D Scene"
-- Rename root node to "main"
-- Save as "level_1" into scenes folder
-</details>
+    ![alt text](images/prjsetup1.png)
+  </details>
 
-### 6. Tilemap
+**Setup main scene (level 1)**
+- Select "2D Scene"
+  <details><summary>image</summary>
 
-- Setting up environment (background & tile map)
-- Misc
-  - Tileset
-    - Defines what "tiles" we can use
-    - palette of building blocks
-    - resource that stores collection of textures (sprites, images, etc) and defines how those textures should behave
-      - allows for defining physics, collisions, naviations, etc.
-  - TileMap
-    - Canvas for drawing using tiles from tileset
-    - Must be assigned tileset
-      
-<details><summary>6A. Fix blurry pixelated sprites</summary>
+    ![alt text](images/prjsetup2.png)
+  </details>
   
-  - Project > Project Settings > Rendering > Textures > Default Texture Filter, change from "linear" to "nearest"
-</details>
+- Rename "Node2D" to "Main"
+  <details><summary>image</summary>
 
-<details><summary>6B. Create TileSet Resource (platforms) with collision detection</summary>
+    ![alt text](images/prjsetup3.png)
+  </details>
+- Save scene as "level_1" into scenes folder
+  <details><summary>image</summary>
 
-  - Create new tileset resource (save to tiles folder)
-  - Add "tiles_packed.png" to the tileset resource
-  - Change texture region to 18x by 18x in "tileset (bottom) > setup > texture region"
-  - Change tile size to 18x by 18x in "Tileset (side) > Tile Size"
-  - Add physics layer: Go to "TileSet (side) > Physics Layers > + Add element"
-  - Apply physics to platform tiles:
-    - Go to "TileSet (bottom) > Paint > Physics > Physics_Layer_0"
-    - "Paint" the platform tiles in the tileset that should have collisions (so player doesn't fall through when touched)
-</details>
+    ![alt text](images/prjsetup4.png)
+  </details>
 
-<details><summary>6C. Create level platform + background</summary>
+## 2. Create platforms
 
-  - Drag and Drop backgroundForest.png
-    - Rename it to "BackgroundSprite" in Scene hierarchy
-  - Add "TileMapLayer" node as child of root scene
-  - Set the created tileset as tileset for "TileMapLayer"
-  - From the bottom, select tiles and paint the scene (creating platforms)
-</details>
+**Create Tileset Resource**
+- Add `TileSet` resource to `Tiles` folder (name it whatever)
+  <details><summary>image</summary>
+
+    ![alt text](images/2-platform-1.png)
+    ![alt text](images/2-platform-2.png)
+    ![alt text](images/2-platform-3.png)
+  </details>
+- Double-click the tileset resource to open it in the bottom window (if not already open)
+- Drag `tiles_packed.png` into the ‘Tile Sources’ section.
+- Click yes to the 'atlas' popup
+  <details><summary>image</summary>
+
+    ![alt text](images/2-platform-4.png)
+  </details>
+
+**Fix tileset texture region size**
+- Select "Setup" tab in `TileSet` bottom window (if not already selected)
+  - Adjust "texture region" from 16px to 18px
+- In "inspector" panel on right side, adjust tile size to 18px
+  <details><summary>image</summary>
+
+    ![alt text](images/2-platform-5.png)
+  </details>
+
+**Add Collision properties to TileSet**
+- In "inspector" pannel on right side, click on "+ Add Element" under "Physics Layer"
+  <details><summary>image</summary>
+
+    ![alt text](images/2-platform-6.png)
+  </details>
+- In `TileSet` bottom window, select `Paint` tab, then "Select a Property Editor", then "physics layer 0"
+  <details><summary>image</summary>
+
+    ![alt text](images/2-platform-7.png)
+  </details>
+- Select all the tiles that would need "physics" (aka "solid ground, so player doesn't fall through")
+  <details><summary>image</summary>
+
+    ![alt text](images/2-platform-8.png)
+  </details>
+
+**Setup `TileMapLayer` node**
+- Add `TileMapLayer` node to the scene
+  <details><summary>image</summary>
+
+    ![alt text](images/2-platform-9.png)
+  </details>
+- Add tileset resource to `TileMapLayer` node
+  <details><summary>image</summary>
+
+    ![alt text](images/2-platform-10.png)
+  </details>
+
+**Fix blurry textures**
+- Go to Project > Project Settings
+- Then Select Rendering > Textures
+- Then in Default Texture Filter, change from "linear" to "nearest"      
+
+**Add background to the level**
+- Drag the "backgroundForest.png" image from project folder on bottom left onto the scene
+- Move the newly created "BackgroundForest" sprite node to the top, but below Main so that it appears behind the platforms
+
+
+
+
+
+
+
+
+
+
+
+
+
+## WORK IN PROGRESS! 
+----------
+
+
+
 
 ### 7. Player Scene
 
