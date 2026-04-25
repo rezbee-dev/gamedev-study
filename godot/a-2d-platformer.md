@@ -71,6 +71,7 @@
 - Character should fall when off the platform (there should be gravity)
 - Movement should not be rigid; should be smooth with very slight acceleration and deceleration
 - Character animation should play when moving and jumping
+
     ![alt text](images/2dplt-b.png)
 
     ![alt text](images/2dplt-c.png)
@@ -102,6 +103,7 @@
 ## Create Level End Flag
 - Create end flag where when player touches it, it transitions to the next level
 - Player score should persist when moving to next level 
+
     ![alt text](images/2dplt-h.png)
 
 ## Create UI (hearts and score display)
@@ -111,6 +113,7 @@
   - Score should update when player collects coins
   - Score should persist when player moves to next level 
 - UI should remain in top left corner
+
   ![alt text](images/2dplt-i.png)
 
 ## Implement player damage feedback
@@ -119,6 +122,7 @@
 
 ## Tiling background & Parallax effect
 - Create tiling background to form a long strip that covers entire level
+
   ![alt text](images/2dplt-j.png)
 - Implement parallax effect where background moves at a different rate than foreground, creating a sense of depth
 
