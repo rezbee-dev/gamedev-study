@@ -3,7 +3,7 @@
 
 ## 1. Project Setup
 
-**1A. Create project folders:** 
+### 1A. Create project folders:
 - Audio, Sprites, Scripts, and Scenes
 - Import assets into appropriate folders
   - https://mega.nz/folder/tOdyiITJ#HHo_NvrW6vjup-Wh5bCyzQ
@@ -12,7 +12,7 @@
     ![alt text](images/prjsetup1.png)
   </details>
 
-**1B. Setup main scene (level 1)**
+### 1B. Setup main scene (level 1)
 - Select "2D Scene"
   <details><summary>image</summary>
 
@@ -32,7 +32,7 @@
 
 ## 2. Create platforms
 
-**2A. Create Tileset Resource**
+### 2A. Create Tileset Resource
 - Add `TileSet` resource to `Tiles` folder (name it whatever)
   <details><summary>image</summary>
 
@@ -50,7 +50,7 @@
     ![alt text](images/2-platform-4.png)
   </details>
 
-**2B. Fix tileset texture region size**
+### 2B. Fix tileset texture region size
 - Select "Setup" tab in `TileSet` bottom window (if not already selected)
   - Adjust "texture region" from 16px to 18px
 - In "inspector" panel on right side, adjust tile size to 18px
@@ -59,7 +59,7 @@
     ![alt text](images/2-platform-5.png)
   </details>
 
-**2C. Add Collision properties to TileSet**
+### 2C. Add Collision properties to TileSet
 - In "inspector" pannel on right side, click on "+ Add Element" under "Physics Layer"
   <details><summary>image</summary>
 
@@ -76,7 +76,7 @@
     ![alt text](images/2-platform-8.png)
   </details>
 
-**2D. Setup `TileMapLayer` node**
+### 2D. Setup `TileMapLayer` node
 - Add `TileMapLayer` node to the scene
   <details><summary>image</summary>
 
@@ -88,19 +88,19 @@
     ![alt text](images/2-platform-10.png)
   </details>
 
-**2E. Fix blurry textures**
+### 2E. Fix blurry textures
 - Go to Project > Project Settings
 - Then Select Rendering > Textures
 - Then in Default Texture Filter, change from "linear" to "nearest"      
 
-**2F. Add background to the level**
+### 2F. Add background to the level
 - Drag the "backgroundForest.png" image from project folder on bottom left onto the scene
 - Move the newly created "BackgroundForest" sprite node to the top, but below Main so that it appears behind the platforms
 
 
 ## 3. Create Player
 
-**3A. Setup Player scene**
+### 3A. Setup Player scene
 - Add to current scene, `CharacterBody2D` node
 - Rename to "Player"
 - Save it as scene, into scenes folder
@@ -129,7 +129,7 @@
   </details>
   - Reposition camera as necessary
 
-**3B. Setup Input Actions**
+### 3B. Setup Input Actions
 - Go to "Project" in top menu and select "Project Settings..."
 - Select "Input Map" tab in the "Project Settings" window
 - Create the actions: "move_left, move_right, jump"
@@ -144,7 +144,7 @@
       ![alt text](images/2dplt-g-3a-5.png)
     </details>
 
-**3C. Setup Player script for left & right movement**
+### 3C. Setup Player script for left & right movement
 - Select root node of `Player` scene
 - In inspector panel on right, click on "Attach Script" icon at the bottom, and select "New Script" 
   <details><summary>image</summary>
@@ -177,7 +177,7 @@
 
 
 
-**3D. Add gravity to player so player falls instead of floating in mid-air**
+### 3D. Add gravity to player so player falls instead of floating in mid-air
 - Modify code to include velocity.y movement if player is not on floor
   <details><summary>code</summary>
 
@@ -207,7 +207,7 @@
   </details>
 
 
-**3E. Add jumping**
+### 3E. Add jumping
   <details><summary>code</summary>
 
     ```gd
@@ -239,7 +239,8 @@
     ```
   </details>
 
-**3F. Smooth out character's movement**
+### 3F. Smooth out character's movement
+
   <details><summary>code</summary>
 
     ```gd
@@ -276,7 +277,8 @@
     ```
   </details>
 
-**3G. Flip sprite so it faces the direction player is moving in**
+### 3G. Flip sprite so it faces the direction player is moving in
+
   <details><summary>code</summary>
 
     ```gd
@@ -319,7 +321,7 @@
     ```
   </details>
 
-**3H. Setup character movement animation**
+### 3H. Setup character movement animation
 - Add `AnimationPlayer` node to scene
 - Select it to display the animation window at the bottom
 - Create new animation, called "IDLE"
@@ -362,10 +364,10 @@
   </details>  
   - adjust the animation timeline duration and keyframes positions as necessary to make the animation look good
 
-**3I. Setup character jump animation**
+### 3I. Setup character jump animation
 - Do the same as above, except name the animation as "jump" and change the texture for the key frame to the one "movement character state" sprite, where the characters legs are open
 
-**3J. Implement animations in code**
+### 3J. Implement animations in code
   <details><summary>code</summary>
 
     ```gd
@@ -423,7 +425,7 @@
 
 ## 4. Create Enemy
 
-**4A. Setup Enemy Scene**
+### 4A. Setup Enemy Scene
 - Select "level_1" scene (main scene)
 - Add `Area2D` node and rename to "Enemy"
 - Save scene as "enemy.tscn" into scenes folder
@@ -435,7 +437,7 @@
   - Add `New CircleShape2D` shape to the node (like with Player)
   - Adjust the shape over the sprite
 
-**4B. Code enemy automatic patrol between two points**
+### 4B. Code enemy automatic patrol between two points
 - Select root node in "enemy" scene
 - Create and attach new script, named "enemy.gd".
 - Save to scripts folder
@@ -460,10 +462,118 @@
             target_pos = start_pos
       ```
   </details>
-- Back in "level_1" scene, position enemy somewhere
+- Back in "level_1" scene, position enemy somewhere to have it move
   - set "move direction" property values in inspector (example, set y to -50, to have enemy move up and down)
   - confirm enemy movement by playing the game
 
+### 4C. Implement enemy detection of player collision (touch)
+- Select enemy root node (Area2D)
+  - Go to Inspector panel, and click the "Node" tab, then select "Signals"
+  - Select "body_entered(body:Node2D)", double-click, and select "Connect"  
+  <details><summary>image</summary>
 
-**4?. Implement Enemy animations**
+
+    ![alt text](images/2dplt-g-4-1.png)
+
+    ![alt text](images/2dplt-g-4-2.png)
+  </details>    
+  - Select the player node, then go to the Node panel, and click on "Groups" tab
+    - click on the "+" icon to create a new group, labelled "Player"
+  <details><summary>image</summary>
+
+    ![alt text](images/2dplt-g-4-3.png)
+
+    ![alt text](images/2dplt-g-4-4.png)
+  </details>  
+  - Modify `enemy.gd` script so that we can show that enemy is able to handle player detection (via console printing)
+  <details><summary>code</summary>
+
+      ```gd
+        extends Area2D
+
+        @export var move_direction : Vector2
+        @export var move_speed : float = 20
+
+        @onready var start_pos : Vector2 = global_position
+        @onready var target_pos : Vector2 = global_position + move_direction
+
+        func _physics_process(delta):
+          global_position = global_position.move_toward(target_pos, move_speed * delta)
+          
+          if global_position == target_pos:
+            if target_pos == start_pos:
+              target_pos = start_pos + move_direction
+            else:
+              target_pos = start_pos
+
+        # NEW
+        func _on_body_entered(body):
+          if not body.is_in_group("Player"):
+            return
+          
+          body.take_damage(1)
+      ```
+  </details>
+  - If you play the game and touch an enemy, you should see the message pop-up in the console output
+  <details><summary>image</summary>
+
+    ![alt text](images/2dplt-g-4-5.png)
+  </details> 
+
+### 4D. Implement Enemy animations
 - Add "AnimationPlayer" to the "Enemy" scene
+- Just like with Player, create new animation labelled "fly"
+- add track for Sprite's texture
+- Set animation duration to 0.3
+- Move the timeline to about 0.1 seconds, and create new keyframe (right-click on track and select "Insert key")
+- With the keyframe selected, swap out the texture so its the same sprite, but in a different state of movement
+- Repeat until you use up all the enemy sprites
+- Enable looping for the animation
+- Play the animation to confirm it looks fine
+- Add the following code to "enemy.gd" script:
+
+  ```gd
+  func _ready():
+    $AnimationPlayer.play("fly")
+  ```
+
+## 5. Implement Game Over
+
+### 5A. Update player.gd script
+- Open `player.gd` script
+- Need to add variable for tracking player health, function for decreasing health (damage), and function for ending the game 
+<details><summary>code</summary>
+
+
+  ```gd
+    # player.gd
+
+    # add the following code to the script:
+
+    @export var health : int = 3
+
+    func take_damage (amount : int):
+      health -= amount
+      
+      if health <= 0:
+        call_deferred("game_over")
+
+    # reloads current scene; later it will be modified to return player to main menu
+    func game_over ():
+      get_tree().change_scene_to_file("res://Scenes/level_1.tscn")
+  ```
+</details>
+
+### 5B. Update enemy.gd script
+- Update `enemy.gd` script to call the player `take_damage()` function when `on_body_entered()` is triggered
+
+  ```gd
+    # enemy.gd
+    func _on_body_entered(body):
+      if not body.is_in_group("Player"):
+        return
+      body.take_damage(1)
+  ```
+- Test out functionality by playing the game, touching an enemy, and seeing if the level resets
+
+## 6. Create coin
