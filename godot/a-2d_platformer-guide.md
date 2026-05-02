@@ -577,3 +577,98 @@
 - Test out functionality by playing the game, touching an enemy, and seeing if the level resets
 
 ## 6. Create coin
+
+### 6A. Setup Coin scene
+- Create new scene and add `Area2D` node, renaming it to "Coin"
+- Save as `coin.tscn` to scene folder, and open it up
+- Drag and drop the coin sprite onto the scene
+  - rename the resulting node to "Sprite"
+  - position the sprite node to (0,0) (in the inspector, on the position fields)
+- Add a `CollisionShape2D` node
+  - set `CircleShape2D` to it, and adjust/position as necessary so it covers the sprite
+
+### 6B. Animate the Coin
+- Attach script called "coin.gd" to Coin root node
+- implement rotate & bobbing up and down functionalities
+
+  <details><summary>code</summary>
+
+    ```gd
+      extends Area2D
+
+      var rotate_speed : float = 3.0
+      var bob_height : float = 5.0
+      var bob_speed : float = 5.0
+
+      @onready var start_pos : Vector2 = global_position
+      @onready var sprite : Sprite2D = $Sprite
+
+      func _physics_process(_delta):
+        var time = Time.get_unix_time_from_system()
+        
+        # rotate
+        sprite.scale.x = sin(time * rotate_speed)
+        
+        # bob up and down
+        var y_pos = ((1 + sin(time * bob_speed)) / 2) * bob_height
+        global_position.y = start_pos.y - y_pos
+    ```
+  </details>
+
+### 6C. Implement coin collection & score increase
+- Open `player.gd` and add the following code to it:
+  ```gd
+    func increase_score(amount: int):
+    print("increase score")
+  ```
+- Add `body_entered` signal to coin:
+  - Select Coin root node
+  - Go to Node Tab (panel on the right)
+  - Select Signals, and then find and select `body_entered(body: Node2D)`
+  - Double-click on it and follow the prompts to connect it to the `coin.gd` script
+  - add the following code inside of `coin.gd` script, under `_on_body_entered(body):` function
+  ```gd
+    func _on_body_entered(body):
+      if not body.is_in_group("Player"):
+        return
+      body.increase_score(1)
+      queue_free()
+  ```
+  - test if player can collect coins
+
+
+### 6D. Persist scores across levels
+- Currently, score resets when new scene/level loads
+- Go to Project -> Project Settings
+- Navigate to Globals and in the "Node Name" field, enter "PlayerStats" and click Add
+- When prompted, save script as "player_stats.gd" to Scripts folder
+  <details><summary>image</summary>
+
+    ![alt text](images/2dplt-g-6-1.png)
+  </details>
+- Doing this will add the script to the "Autoload" list
+- Open the "player_stats.gd" script and put:
+  ```gd
+    extends Node
+
+    var score : int = 0
+  ```
+- Open "player.gd" script, and modify the `increase_score()` function, 
+
+  ```gd
+    func increase_score (amount : int):
+      PlayerStats.score += amount
+      OnUpdateScore.emit(PlayerStats.score)
+      play_sound(coin_sfx)
+  ```
+- Should see score persist from level to level
+
+## 7. Create End Flag
+
+### 7A. Create End Flag
+- Create new scene with Area2D Node and rename it and save scene as "EndFlag"
+- Add "flag" sprite to the scene and rename the node to Sprite
+  - Set position of sprite to (0,0)
+- Add CollisionShape2D node
+  - Set shape to CircleShape2D and size/position it accordingly
+ 
