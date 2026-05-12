@@ -651,7 +651,7 @@ Resources
 - Modify the weights based on health percentages.
 - Choose a random combat action based on the modified weights.
 
-  <details><summary></summary>
+  <details><summary>Solution</summary>
   
     ```gd
       func ai_decide_combat_action () -> CombatAction:
@@ -692,6 +692,22 @@ Resources
       	return null
     ```
   </details>
+
+## 20. End Game
+
+**20A. Create EndScreen Panel**
+- Create window that displays once game ends; it shows who won the game and gives option to "play again"
+
+<details><summary>20A. Solution</summary>
+
+  - Create the window
+    - From `CanvasLayer` node in `Main` scene, add child node `Panel`
+    - Rename to "EndScreen"
+    - Resize to fill the screen
+    - Go to Layout in inspector and open Anchor Preset, change it from Top Left to Full Rect (so it streches across the full screen)
+    - Give panel a solid color: Inspector > Them Overrides > Styles > Panel > click dropdown > New StyleBoxFlat and change `bg_color`
+  - 
+</details>
 
 <details><summary></summary>
 
