@@ -49,3 +49,5 @@ Need to create background that loops
 **Create Animation**
 - Add animationplayer to the Node2D parent whose children are the background
 - Create new animation, labeled loop
+- Select first node w/ background and add position keyframe to the animation
+- 
