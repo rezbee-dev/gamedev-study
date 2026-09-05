@@ -34,7 +34,6 @@
 ### 3. Scrolling background
 
 - Create background scrolling/moving forward effect via animation
-- Add borders to the boundaries of the game that detects/ stops player from moving outside boundaries
 
 **Create Scrolling Background**
 - background (`darkPurple.png`)
@@ -45,33 +44,9 @@
 - Implementation
   - two `TileMapLayer` nodes with the `darkPurple.png` texture
   - one fills up entire viewport, then the other duplicate one sits on top
-  - 
-
-- 
-- Add Node2D to main scene
-- Add as child, Node2D with TileMapLayer as child with darkpurple.png as tileset
-- Do not allow automatic atlas region thingy
-- Select it so the entire image is a single tile
-- Set Texture Region to 256 by 256 (in tileset)
-- Set Tile Size inspector to 256x256
-- Fill out the viewport (purple box) with the tiles
-- Duplicate the Node2D with the tilemaplayer
-- Reposition it above the original Node2D with the tilemaplayer
-
-**Create Animation**
-- Add animationplayer to the Node2D parent whose children are the background
-- Create new animation, labeled loop
-- Select first node w/ background and add position keyframe to the animation
-- Move the first node (background) then add the position keyframe again into the animation (8:00)
-- Do the same for the other node (add to animation track and move down)
-- Enable animation looping
-
-**Add borders**
-- to prevent players from going though game boundaries
-- Can use staticbody2d and collisionshapes (add borders around one of the backgrounds)
-
-**add script**
-- add script to background parent node to start animationplayer when game is in play and pause animationplayer when game over
+  - With `AnimationPlayer` node, add the positions of the `TileMapLayer` nodes, move them down an entire viewport's height, and then loop the animation
+  - add script to parent node to start the animation when `game_over = true`, and vice-versa
+ 
 
 ### 4. UI Nodes
 
