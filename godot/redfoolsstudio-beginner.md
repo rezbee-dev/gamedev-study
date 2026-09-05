@@ -50,12 +50,27 @@
 
 ### 4. UI Nodes
 
-**Setup nodes**
-- Add Node2D to main scene; rename it to "ui"
-- add canvaslayer node
-- add 4 screens (as node2d): startscreen, choosescreen, ingamescreen, gameoverscreen
+<img width="617" height="275" alt="image" src="https://github.com/user-attachments/assets/387937e2-a5ab-4061-8c5d-30c2aaf81ab7" />
 
 **Start Screen**
+- Game Title
+- Play Button
+
+**Ship Selection**
+- Buttons for choosing ship
+- Image that displays chosen ship
+- Choose button for selecting ship and proceeding to game
+
+**In game screen**
+- Mute button
+- Score
+
+**Game over screen**
+- Game Over
+- Score
+- Main menu button
+
+
 - Game title in first half of screen (label node)
 - Use font from game assets
 - Add background/ outline to the title
