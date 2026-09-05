@@ -116,7 +116,7 @@ Need to create background that loops
   - if global.game_over = true, then set ingamescreen visibility to false and game over screen to true
   - if not game over, then set score(s) to str(Global.score)
 
-## 6. Laser Nodes
+### 6. Laser Nodes
 
 **Setup Laser**
 - Create new scene with CharacterBody2D as root node
@@ -131,6 +131,16 @@ Need to create background that loops
 
 **Create Laser2 and Laser3**
 - Duplicate the laser scene and rename duplicates laser 2 and 3
+- laser three
+  - need to make a long laser
+  - Use sprite2d to stretch out laser to the entire screen length
+  - Also stretch out the collisionshape2d
+
+### 7. Laser Script
+
+**Laser One Script**
+
+
 
 
 
