@@ -19,23 +19,35 @@
 
 **Create global script named `global.gd`"**
 
-Add variables for
-- tracking game over
-- tracking game on
-- tracking score
-- setting `chosen_ship` (int)
-- sound mute
+- Add variables:
+  ```
+  var game_over = false
+  var game_on = false
+  var score = 0
+  var chosen_ship = 1
+  var mute = false 
+  ```
 
-Create function that resets values of the variables
-
-Add `_process(delta)` function
-- mute audio if mute is set to true and vice-versa
+- Create function that resets the values of the variables
+- Create function that checks for `mute` and mutes or unmutes audio accordingly
 
 ### 3. Scrolling background
 
-Need to create background that loops 
+- Create background scrolling/moving forward effect via animation
+- Add borders to the boundaries of the game that detects/ stops player from moving outside boundaries
 
-**Create Background**
+**Create Scrolling Background**
+- background (`darkPurple.png`)
+  - needs to fill entire viewport
+  - needs to move forward / scroll
+  - size for `darkPurple.png` is 256px by 256px
+
+- Implementation
+  - two `TileMapLayer` nodes with the `darkPurple.png` texture
+  - one fills up entire viewport, then the other duplicate one sits on top
+  - 
+
+- 
 - Add Node2D to main scene
 - Add as child, Node2D with TileMapLayer as child with darkpurple.png as tileset
 - Do not allow automatic atlas region thingy
